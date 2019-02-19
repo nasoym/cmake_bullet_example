@@ -11,6 +11,7 @@ if [[ "${trace:=0}" -eq 1 ]];then
   export trace
 fi
 
+rm -rf build_cmake
 mkdir -p build_cmake 
 cd build_cmake 
 cmake ../ 
