@@ -25,11 +25,26 @@ include_directories(/Users/sinangoo/sinan/public/bullet3/src)
 add_executable(hello src/hello.cpp)
 
 
-# find_package(bullet
-#   REQUIRED
-#   PATHS
-#   /Users/sinangoo/sinan/public/bullet3/
-#   )
+# find_package(bullet REQUIRED PATHS /Users/sinangoo/sinan/public/bullet3/)
+# find_package(Bullet 2.87 REQUIRED )
+# # find_package(Bullet REQUIRED )
+# find_package(Bullet REQUIRED PATHS /Users/sinangoo/sinan/public/bullet3/)
+# if (Bullet_FOUND)
+#   message("Bullet found")
+#   message("Bullet include: " ${BULLET_INCLUDE_DIR})
+#   message("Bullet lib: " ${BULLET_COLLISION_LIBRARY})
+#   message("Bullet lib: " ${BULLET_DYNAMICS_LIBRARY})
+#
+# endif (Bullet_FOUND)
+# find_package(nlohmann_json REQUIRED)
+# find_package(nlohmann_json 3.4.0 REQUIRED PATHS /usr/local/Cellar/nlohmann_json/3.4.0)
+# if (nlohmann_json_FOUND)
+#   message("json libs: " ${nlohmann_json_LIBRARIES})
+# endif (nlohmann_json_FOUND)
+add_subdirectory(/Users/sinangoo/sinan/public/bullet3/)
+
+
+
 #
 # target_link_libraries(
 #   hello
@@ -56,3 +71,33 @@ target_link_libraries(
 #     ${BULLET}
 #     )
 
+
+
+# BULLET_COLLISION_LIBRARY:FILEPATH=/usr/local/lib/libBulletCollision.a
+#
+# // Path to a library.
+# BULLET_COLLISION_LIBRARY_DEBUG:FILEPATH=BULLET_COLLISION_LIBRARY_DEBUG-NOTFOUND
+#
+# // Path to a library.
+# BULLET_DYNAMICS_LIBRARY:FILEPATH=/usr/local/lib/libBulletDynamics.a
+#
+# // Path to a library.
+# BULLET_DYNAMICS_LIBRARY_DEBUG:FILEPATH=BULLET_DYNAMICS_LIBRARY_DEBUG-NOTFOUND
+#
+# // Path to a file.
+# BULLET_INCLUDE_DIR:PATH=/usr/local/include/bullet
+#
+# // Path to a library.
+# BULLET_MATH_LIBRARY:FILEPATH=/usr/local/lib/libLinearMath.a
+#
+# // Path to a library.
+# BULLET_MATH_LIBRARY_DEBUG:FILEPATH=BULLET_MATH_LIBRARY_DEBUG-NOTFOUND
+#
+# // Path to a library.
+# BULLET_SOFTBODY_LIBRARY:FILEPATH=/usr/local/lib/libBulletSoftBody.a
+#
+# // Path to a library.
+# BULLET_SOFTBODY_LIBRARY_DEBUG:FILEPATH=BULLET_SOFTBODY_LIBRARY_DEBUG-NOTFOUND
+#
+#
+#
