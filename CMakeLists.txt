@@ -24,6 +24,7 @@ include_directories(/Users/sinangoo/sinan/public/bullet3/src)
 #
 add_executable(hello src/hello.cpp)
 
+find_package(foo REQUIRED MODULE PATHS /Users/sinangoo/sinan/public/bullet3/)
 
 # find_package(bullet REQUIRED PATHS /Users/sinangoo/sinan/public/bullet3/)
 # find_package(Bullet 2.87 REQUIRED )
@@ -41,7 +42,7 @@ add_executable(hello src/hello.cpp)
 # if (nlohmann_json_FOUND)
 #   message("json libs: " ${nlohmann_json_LIBRARIES})
 # endif (nlohmann_json_FOUND)
-add_subdirectory(/Users/sinangoo/sinan/public/bullet3/)
+# add_subdirectory(/Users/sinangoo/sinan/public/bullet3/)
 
 
 
