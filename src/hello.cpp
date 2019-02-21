@@ -17,6 +17,9 @@ subject to the following restrictions:
 #include "btBulletDynamicsCommon.h"
 #include <stdio.h>
 
+#include <nlohmann/json.hpp>
+
+
 /// This is a Hello World program for running a basic Bullet physics simulation
 
 int main(int argc, char** argv)
