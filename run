@@ -13,7 +13,6 @@ fi
 
 rm -rf build_cmake
 mkdir -p build_cmake 
-cd build_cmake 
-cmake ../ 
-make 
+( cd build_cmake ; cmake ../  ; make )
+# socat TCP-LISTEN:9999,reuseaddr,fork STDOUT | ./build_cmake/hello
 

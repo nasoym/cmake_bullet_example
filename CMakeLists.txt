@@ -4,7 +4,6 @@ project (hello)
 
 set (CMAKE_CXX_STANDARD 11)
 
-
 include_directories(
   /Users/sinangoo/sinan/public/bullet3/src
   /usr/local/Cellar/nlohmann_json/3.4.0/include

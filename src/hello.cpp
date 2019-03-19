@@ -17,8 +17,19 @@ subject to the following restrictions:
 #include "btBulletDynamicsCommon.h"
 #include <stdio.h>
 
+#include <iostream>
+#include <string>
+#include <unistd.h>
+#include <sys/poll.h>
+
+#include <deque>
+#include <map>
+#include <iterator>
+
 #include <nlohmann/json.hpp>
 
+using namespace std;
+using json = nlohmann::json;
 
 /// This is a Hello World program for running a basic Bullet physics simulation
 
@@ -52,6 +63,7 @@ int main(int argc, char** argv)
 	btAlignedObjectArray<btCollisionShape*> collisionShapes;
 
 	///create a few basic rigid bodies
+  map <int,btRigidBody*> bodyMap;
 
 	//the ground is a cube of side 100 at position y = -56.
 	//the sphere will hit it at y = -6, with center at -5
@@ -80,7 +92,11 @@ int main(int argc, char** argv)
 
 		//add the body to the dynamics world
 		dynamicsWorld->addRigidBody(body);
+    bodyMap.insert(make_pair(1,body));
+
+
 	}
+
 
 	{
 		//create a dynamic rigidbody
@@ -110,32 +126,112 @@ int main(int argc, char** argv)
 		btRigidBody* body = new btRigidBody(rbInfo);
 
 		dynamicsWorld->addRigidBody(body);
+
+    bodyMap.insert(make_pair(2,body));
+
 	}
 
 	/// Do some simulation
 
-	///-----stepsimulation_start-----
-	for (i = 0; i < 150; i++)
-	{
-		dynamicsWorld->stepSimulation(1.f / 60.f, 10);
 
-		//print positions of all objects
-		for (int j = dynamicsWorld->getNumCollisionObjects() - 1; j >= 0; j--)
-		{
-			btCollisionObject* obj = dynamicsWorld->getCollisionObjectArray()[j];
-			btRigidBody* body = btRigidBody::upcast(obj);
-			btTransform trans;
-			if (body && body->getMotionState())
-			{
-				body->getMotionState()->getWorldTransform(trans);
-			}
-			else
-			{
-				trans = obj->getWorldTransform();
-			}
-			printf("world pos object %d = %f,%f,%f\n", j, float(trans.getOrigin().getX()), float(trans.getOrigin().getY()), float(trans.getOrigin().getZ()));
-		}
-	}
+
+  char newline = '\n';
+  char bytes_from_stdin[1024];
+  ssize_t bytes_read;
+  string appended_bytes_from_stdin;
+  size_t newline_pos_in_stdin = 0;
+
+  struct pollfd fds;
+  fds.fd = 0; /* this is STDIN */
+  fds.events = POLLIN;
+  int poll_return;
+
+  deque<string> line_deque;
+
+  json json_line;
+
+  while(1) {
+    poll_return = poll(&fds, 1, 0);
+    if(poll_return == 1) {
+      // bytes_read = read(&fds, message, nbytes);
+      bytes_read = read(0, bytes_from_stdin, sizeof(bytes_from_stdin));
+      appended_bytes_from_stdin.append(bytes_from_stdin, bytes_read);
+      while ((newline_pos_in_stdin = appended_bytes_from_stdin.find(newline)) != std::string::npos) {
+        line_deque.push_back(appended_bytes_from_stdin.substr(0, newline_pos_in_stdin));
+        appended_bytes_from_stdin.erase(0, newline_pos_in_stdin + 1);
+      }
+    // } else if(poll_return == 0) {
+    // //   printf("No");
+    // } else {
+    } else if(poll_return != 0) {
+      std::cerr << "error while polling stdin for data" << std::endl;
+    }
+    while (!line_deque.empty()) {
+      try {
+        json_line = json::parse(line_deque.front());
+        if (json_line.find("command") != json_line.end()) {
+          std::cout << "command: " << json_line["command"].get<string>() << std::endl;
+          if (json_line["command"].get<string>().compare("abc") == 0) {
+            std::cout << "ABC" << std::endl;
+          }
+        }
+      }
+      catch (json::exception& e) {
+        // output exception information
+        std::cerr << "message: " << e.what() << '\n'
+                   << "exception id: " << e.id << std::endl;
+      }
+      line_deque.pop_front();
+    }
+
+    sleep(1);
+    //   std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    //   std::cout << "- after sleep" << std::endl;
+    ///-----stepsimulation_start-----
+    // for (i = 0; i < 150; i++)
+    {
+      dynamicsWorld->stepSimulation(1.f / 60.f, 10);
+
+      // //print positions of all objects
+      // for (int j = dynamicsWorld->getNumCollisionObjects() - 1; j >= 0; j--)
+      // {
+      //   btCollisionObject* obj = dynamicsWorld->getCollisionObjectArray()[j];
+      //   btRigidBody* body = btRigidBody::upcast(obj);
+      //   btTransform trans;
+      //   if (body && body->getMotionState())
+      //   {
+      //     body->getMotionState()->getWorldTransform(trans);
+      //   }
+      //   else
+      //   {
+      //     trans = obj->getWorldTransform();
+      //   }
+      //   printf("{\"id\":%d,\"pos\":[%f,%f,%f]}\n", j, float(trans.getOrigin().getX()), float(trans.getOrigin().getY()), float(trans.getOrigin().getZ()));
+      // }
+      //
+
+      map<int, btRigidBody*>::iterator it = bodyMap.begin();
+      while(it != bodyMap.end())
+      {
+          // std::cout<<it->first<<" :: "<<it->second<<std::endl;
+
+        btRigidBody* body = it->second;
+        btTransform trans;
+        if (body && body->getMotionState())
+        {
+          body->getMotionState()->getWorldTransform(trans);
+        }
+        printf("{\"id\":%d,\"pos\":[%f,%f,%f]}\n", it->first, float(trans.getOrigin().getX()), float(trans.getOrigin().getY()), float(trans.getOrigin().getZ()));
+
+
+        it++;
+      }
+
+    }
+
+  }
+  // return 0;
+
 
 	///-----stepsimulation_end-----
 
