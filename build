@@ -11,5 +11,9 @@ if [[ "${trace:=0}" -eq 1 ]];then
   export trace
 fi
 
-socat TCP-LISTEN:9999,reuseaddr,fork STDOUT | ./build_cmake/hello
+rm -rf build_cmake
+mkdir -p build_cmake 
+cd build_cmake 
+cmake ../ 
+make
 
