@@ -64,6 +64,7 @@ int main(int argc, char** argv)
 
 	///create a few basic rigid bodies
   map <string,btRigidBody*> bodyMap;
+  map <string,pair<btRigidBody*,json>> bodyMapPair;
 
 	// //the ground is a cube of side 100 at position y = -56.
 	// //the sphere will hit it at y = -6, with center at -5
@@ -182,7 +183,13 @@ int main(int argc, char** argv)
 
               //create a dynamic rigidbody
 
-              btCollisionShape* colShape = new btBoxShape(btVector3(1,1,1));
+              btCollisionShape* colShape = new btBoxShape(
+                  btVector3(
+                    json_line["size"][0].get<float>(),
+                    json_line["size"][1].get<float>(),
+                    json_line["size"][2].get<float>()
+                    )
+                  );
               //btCollisionShape* colShape = new btSphereShape(btScalar(1.));
               collisionShapes.push_back(colShape);
 
@@ -190,7 +197,8 @@ int main(int argc, char** argv)
               btTransform startTransform;
               startTransform.setIdentity();
 
-              btScalar mass(1.f);
+
+              btScalar mass(json_line["mass"].get<float>());
 
               //rigidbody is dynamic if and only if mass is non zero, otherwise static
               bool isDynamic = (mass != 0.f);
@@ -199,7 +207,13 @@ int main(int argc, char** argv)
               if (isDynamic)
                 colShape->calculateLocalInertia(mass, localInertia);
 
-              startTransform.setOrigin(btVector3(2, 10, 0));
+              startTransform.setOrigin(
+                  btVector3(
+                    json_line["pos"][0].get<float>(),
+                    json_line["pos"][1].get<float>(),
+                    json_line["pos"][2].get<float>()
+                    )
+                  );
 
               //using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
               btDefaultMotionState* myMotionState = new btDefaultMotionState(startTransform);
@@ -209,6 +223,7 @@ int main(int argc, char** argv)
               dynamicsWorld->addRigidBody(body);
 
               bodyMap.insert(make_pair(json_line["id"].get<string>(),body));
+              bodyMapPair.insert(make_pair(json_line["id"].get<string>(),make_pair(body,json_line)));
 
             }
 
@@ -250,19 +265,21 @@ int main(int argc, char** argv)
       // }
       //
 
-      map<string, btRigidBody*>::iterator it = bodyMap.begin();
-      while(it != bodyMap.end())
+      map<string, pair<btRigidBody*,json>>::iterator it = bodyMapPair.begin();
+      while(it != bodyMapPair.end())
       {
           // std::cout<<it->first<<" :: "<<it->second<<std::endl;
 
-        btRigidBody* body = it->second;
+        // pair<btRigidBody*,json> bla = it->second;
+        // btRigidBody* body = bla.first;
+        btRigidBody* body = it->second.first;
         btTransform trans;
         if (body && body->getMotionState())
         {
           body->getMotionState()->getWorldTransform(trans);
         }
         printf(
-            "{\"id\":\"%s\",\"pos\":[%f,%f,%f],\"rot\":[%f,%f,%f,%f]}\n", 
+            "{\"id\":\"%s\",\"pos\":[%f,%f,%f],\"rot\":[%f,%f,%f,%f],json:%s}\n", 
             it->first.c_str(), 
             float(trans.getOrigin().getX()), 
             float(trans.getOrigin().getY()), 
@@ -270,7 +287,8 @@ int main(int argc, char** argv)
             float(trans.getRotation().getX()), 
             float(trans.getRotation().getY()), 
             float(trans.getRotation().getZ()), 
-            float(trans.getRotation().getW()) 
+            float(trans.getRotation().getW()),
+            it->second.second.dump().c_str()
             );
         it++;
       }
