@@ -266,31 +266,47 @@ int main(int argc, char** argv)
       //
 
       map<string, pair<btRigidBody*,json>>::iterator it = bodyMapPair.begin();
-      while(it != bodyMapPair.end())
-      {
-          // std::cout<<it->first<<" :: "<<it->second<<std::endl;
+      if(it != bodyMapPair.end()) {
+        printf("[");
 
-        // pair<btRigidBody*,json> bla = it->second;
-        // btRigidBody* body = bla.first;
-        btRigidBody* body = it->second.first;
-        btTransform trans;
-        if (body && body->getMotionState())
+        while(it != bodyMapPair.end())
         {
-          body->getMotionState()->getWorldTransform(trans);
+            // std::cout<<it->first<<" :: "<<it->second<<std::endl;
+
+          // pair<btRigidBody*,json> bla = it->second;
+          // btRigidBody* body = bla.first;
+          btRigidBody* body = it->second.first;
+          btTransform trans;
+          if (body && body->getMotionState())
+          {
+            body->getMotionState()->getWorldTransform(trans);
+          }
+          printf("{");
+          printf(
+              "\"id\":\"%s\",\"type\":\"box\",\"pos\":[%g,%g,%g],\"rot\":[%g,%g,%g,%g],\"size\":[%g,%g,%g]", 
+              it->first.c_str(), 
+              float(trans.getOrigin().getX()), 
+              float(trans.getOrigin().getY()), 
+              float(trans.getOrigin().getZ()),
+              float(trans.getRotation().getX()), 
+              float(trans.getRotation().getY()), 
+              float(trans.getRotation().getZ()), 
+              float(trans.getRotation().getW()),
+              it->second.second["size"][0].get<float>(),
+              it->second.second["size"][1].get<float>(),
+              it->second.second["size"][2].get<float>()
+              );
+          // printf(
+          //     ",json:%s", 
+          //     it->second.second.dump().c_str()
+          //     );
+          printf("}");
+          it++;
+          if(it != bodyMapPair.end()) {
+            printf (",");
+          }
         }
-        printf(
-            "{\"id\":\"%s\",\"pos\":[%f,%f,%f],\"rot\":[%f,%f,%f,%f],json:%s}\n", 
-            it->first.c_str(), 
-            float(trans.getOrigin().getX()), 
-            float(trans.getOrigin().getY()), 
-            float(trans.getOrigin().getZ()),
-            float(trans.getRotation().getX()), 
-            float(trans.getRotation().getY()), 
-            float(trans.getRotation().getZ()), 
-            float(trans.getRotation().getW()),
-            it->second.second.dump().c_str()
-            );
-        it++;
+        printf("]\n");
       }
 
     }
