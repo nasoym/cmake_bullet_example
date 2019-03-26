@@ -11,10 +11,22 @@ if [[ "${trace:=0}" -eq 1 ]];then
   export trace
 fi
 
-jq -c -n '{
-  command:"create",
-  id:"abc"
-}' \
-  | socat - TCP:localhost:9999
+# jq -n -c \
+#   --arg id "$RANDOM" \
+#   '{
+#   command:"create",
+#   id:$id,
+#   mass:1,
+#   size:[5,5,5],
+#   pos:[0,0,20]
+# }' \
+#   | socat - TCP:localhost:9999
+
+echo -ne "\
+{\"command\":\"create\",\"id\":\"${RANDOM}\",\"mass\":10,\"size\":[10,10,10],\"pos\":[0,0,20]}
+{\"command\":\"create\",\"id\":\"${RANDOM}\",\"mass\":10,\"size\":[1,1,1],\"pos\":[1,0,19]}
+{\"command\":\"create\",\"id\":\"${RANDOM}\",\"mass\":10,\"size\":[3,1,1],\"pos\":[0,0,20]}
+" \
+ | socat - TCP:localhost:9999
 
 

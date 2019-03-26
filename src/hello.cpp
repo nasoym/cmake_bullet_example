@@ -26,6 +26,9 @@ subject to the following restrictions:
 #include <map>
 #include <iterator>
 
+#include <chrono>
+#include <thread>
+
 #include <nlohmann/json.hpp>
 
 using namespace std;
@@ -54,7 +57,7 @@ int main(int argc, char** argv)
 
 	btDiscreteDynamicsWorld* dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, collisionConfiguration);
 
-	dynamicsWorld->setGravity(btVector3(0, -10, 0));
+	dynamicsWorld->setGravity(btVector3(0, 0, -10));
 
 	///-----initialization_end-----
 
@@ -171,15 +174,15 @@ int main(int argc, char** argv)
       try {
         json_line = json::parse(line_deque.front());
         if (json_line.find("command") != json_line.end()) {
-          std::cout << "command: " << json_line["command"].get<string>() << std::endl;
+          // std::cout << "command: " << json_line["command"].get<string>() << std::endl;
           if (json_line["command"].get<string>().compare("create") == 0) {
             // std::cout << "ABC" << std::endl;
 
             map<string, btRigidBody*>::iterator it = bodyMap.find(json_line["id"].get<string>());
             if(it != bodyMap.end()) {
-              std::cout << "id: " << json_line["id"].get<string>() << " was already created" << std::endl;
+              // std::cout << "id: " << json_line["id"].get<string>() << " was already created" << std::endl;
             } else {
-              std::cout << "id: " << json_line["id"].get<string>() << std::endl;
+              // std::cout << "id: " << json_line["id"].get<string>() << std::endl;
 
               //create a dynamic rigidbody
 
@@ -239,11 +242,14 @@ int main(int argc, char** argv)
       line_deque.pop_front();
     }
 
-    sleep(1);
+    // sleep(1);
+    // sleep(0.01);
     //   std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     //   std::cout << "- after sleep" << std::endl;
     ///-----stepsimulation_start-----
     // for (i = 0; i < 150; i++)
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
     {
       dynamicsWorld->stepSimulation(1.f / 60.f, 10);
 
@@ -283,7 +289,7 @@ int main(int argc, char** argv)
           }
           printf("{");
           printf(
-              "\"id\":\"%s\",\"type\":\"box\",\"pos\":[%g,%g,%g],\"rot\":[%g,%g,%g,%g],\"size\":[%g,%g,%g]", 
+              "\"id\":\"%s\",\"type\":\"box\",\"pos\":[%f,%f,%f],\"rot\":[%f,%f,%f,%f],\"size\":[%f,%f,%f]", 
               it->first.c_str(), 
               float(trans.getOrigin().getX()), 
               float(trans.getOrigin().getY()), 
@@ -307,6 +313,8 @@ int main(int argc, char** argv)
           }
         }
         printf("]\n");
+        fflush(stdout);
+
       }
 
     }
