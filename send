@@ -22,11 +22,48 @@ fi
 # }' \
 #   | socat - TCP:localhost:9999
 
-echo -ne "\
-{\"command\":\"create\",\"id\":\"${RANDOM}\",\"mass\":10,\"size\":[10,10,10],\"pos\":[0,0,20]}
-{\"command\":\"create\",\"id\":\"${RANDOM}\",\"mass\":10,\"size\":[1,1,1],\"pos\":[1,0,19]}
-{\"command\":\"create\",\"id\":\"${RANDOM}\",\"mass\":10,\"size\":[3,1,1],\"pos\":[0,0,20]}
+if [[ "$#" -eq 0 ]];then
+  :
+  ${0} help
+
+elif [[ "$1" == "help" ]];then shift
+  which bash_scripts >/dev/null && bash_scripts show_commands ${0}
+
+elif [ "$1" = "base" ];then shift ##
+  echo -ne "\
+{\"command\":\"create\",\"id\":\"${RANDOM}\",\"mass\":0,\"size\":[30,30,10],\"pos\":[0,0,-10]}
 " \
  | socat - TCP:localhost:9999
 
+elif [ "$1" = "single" ];then shift ##
+  id="$1"; shift
+  echo -ne "\
+{\"command\":\"create\",\"id\":\"${id}\",\"mass\":1,\"size\":[1,1,1],\"pos\":[0,0,10]}
+" \
+ | socat - TCP:localhost:9999
 
+elif [ "$1" = "delete" ];then shift ##
+  id="$1"; shift
+  echo -ne "\
+{\"command\":\"delete\",\"id\":\"${id}\"}
+" \
+ | socat - TCP:localhost:9999
+
+elif [ "$1" = "set" ];then shift ##
+  : ${id="sleep_time"}
+  : ${value="100"}
+  echo -ne "\
+{\"command\":\"set\",\"id\":\"${id}\",\"value\":${value}}
+" \
+ | socat - TCP:localhost:9999
+
+elif [ "$1" = "stack" ];then shift ##
+  echo -ne "\
+{\"command\":\"create\",\"id\":\"${RANDOM}\",\"mass\":1,\"size\":[1,1,1],\"pos\":[1,0,20]}
+{\"command\":\"create\",\"id\":\"${RANDOM}\",\"mass\":1,\"size\":[1,1,1],\"pos\":[1,0,21]}
+{\"command\":\"create\",\"id\":\"${RANDOM}\",\"mass\":1,\"size\":[1,1,1],\"pos\":[1,0,22]}
+{\"command\":\"create\",\"id\":\"${RANDOM}\",\"mass\":1,\"size\":[1,1,1],\"pos\":[1,0,23]}
+" \
+ | socat - TCP:localhost:9999
+
+fi

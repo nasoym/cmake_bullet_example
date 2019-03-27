@@ -66,77 +66,7 @@ int main(int argc, char** argv)
 	btAlignedObjectArray<btCollisionShape*> collisionShapes;
 
 	///create a few basic rigid bodies
-  map <string,btRigidBody*> bodyMap;
   map <string,pair<btRigidBody*,json>> bodyMapPair;
-
-	// //the ground is a cube of side 100 at position y = -56.
-	// //the sphere will hit it at y = -6, with center at -5
-	// {
-	// 	btCollisionShape* groundShape = new btBoxShape(btVector3(btScalar(50.), btScalar(50.), btScalar(50.)));
-  //
-	// 	collisionShapes.push_back(groundShape);
-  //
-	// 	btTransform groundTransform;
-	// 	groundTransform.setIdentity();
-	// 	groundTransform.setOrigin(btVector3(0, -56, 0));
-  //
-	// 	btScalar mass(0.);
-  //
-	// 	//rigidbody is dynamic if and only if mass is non zero, otherwise static
-	// 	bool isDynamic = (mass != 0.f);
-  //
-	// 	btVector3 localInertia(0, 0, 0);
-	// 	if (isDynamic)
-	// 		groundShape->calculateLocalInertia(mass, localInertia);
-  //
-	// 	//using motionstate is optional, it provides interpolation capabilities, and only synchronizes 'active' objects
-	// 	btDefaultMotionState* myMotionState = new btDefaultMotionState(groundTransform);
-	// 	btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, myMotionState, groundShape, localInertia);
-	// 	btRigidBody* body = new btRigidBody(rbInfo);
-  //
-	// 	//add the body to the dynamics world
-	// 	dynamicsWorld->addRigidBody(body);
-  //   bodyMap.insert(make_pair("i",body));
-  //
-  //
-	// }
-  //
-  //
-	// {
-	// 	//create a dynamic rigidbody
-  //
-	// 	//btCollisionShape* colShape = new btBoxShape(btVector3(1,1,1));
-	// 	btCollisionShape* colShape = new btSphereShape(btScalar(1.));
-	// 	collisionShapes.push_back(colShape);
-  //
-	// 	/// Create Dynamic Objects
-	// 	btTransform startTransform;
-	// 	startTransform.setIdentity();
-  //
-	// 	btScalar mass(1.f);
-  //
-	// 	//rigidbody is dynamic if and only if mass is non zero, otherwise static
-	// 	bool isDynamic = (mass != 0.f);
-  //
-	// 	btVector3 localInertia(0, 0, 0);
-	// 	if (isDynamic)
-	// 		colShape->calculateLocalInertia(mass, localInertia);
-  //
-	// 	startTransform.setOrigin(btVector3(2, 10, 0));
-  //
-	// 	//using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
-	// 	btDefaultMotionState* myMotionState = new btDefaultMotionState(startTransform);
-	// 	btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, myMotionState, colShape, localInertia);
-	// 	btRigidBody* body = new btRigidBody(rbInfo);
-  //
-	// 	dynamicsWorld->addRigidBody(body);
-  //
-  //   bodyMap.insert(make_pair("u",body));
-  //
-	// }
-  //
-	/// Do some simulation
-
 
 
   char newline = '\n';
@@ -149,6 +79,8 @@ int main(int argc, char** argv)
   fds.fd = 0; /* this is STDIN */
   fds.events = POLLIN;
   int poll_return;
+
+  int sleep_time = 2000;
 
   deque<string> line_deque;
 
@@ -178,8 +110,8 @@ int main(int argc, char** argv)
           if (json_line["command"].get<string>().compare("create") == 0) {
             // std::cout << "ABC" << std::endl;
 
-            map<string, btRigidBody*>::iterator it = bodyMap.find(json_line["id"].get<string>());
-            if(it != bodyMap.end()) {
+            map<string, pair<btRigidBody*,json>>::iterator it = bodyMapPair.find(json_line["id"].get<string>());
+            if(it != bodyMapPair.end()) {
               // std::cout << "id: " << json_line["id"].get<string>() << " was already created" << std::endl;
             } else {
               // std::cout << "id: " << json_line["id"].get<string>() << std::endl;
@@ -188,9 +120,9 @@ int main(int argc, char** argv)
 
               btCollisionShape* colShape = new btBoxShape(
                   btVector3(
-                    json_line["size"][0].get<float>(),
-                    json_line["size"][1].get<float>(),
-                    json_line["size"][2].get<float>()
+                    json_line["size"][0].get<float>() / 2,
+                    json_line["size"][1].get<float>() / 2,
+                    json_line["size"][2].get<float>() / 2
                     )
                   );
               //btCollisionShape* colShape = new btSphereShape(btScalar(1.));
@@ -225,12 +157,30 @@ int main(int argc, char** argv)
 
               dynamicsWorld->addRigidBody(body);
 
-              bodyMap.insert(make_pair(json_line["id"].get<string>(),body));
               bodyMapPair.insert(make_pair(json_line["id"].get<string>(),make_pair(body,json_line)));
 
             }
 
 
+          }
+          else if (json_line["command"].get<string>().compare("delete") == 0) {
+            map<string, pair<btRigidBody*,json>>::iterator it = bodyMapPair.find(json_line["id"].get<string>());
+            if(it != bodyMapPair.end()) {
+              btRigidBody* body = it->second.first;
+              dynamicsWorld->removeRigidBody(body);
+
+              if (body && body->getMotionState()) {
+                delete body->getMotionState();
+              }
+              bodyMapPair.erase(it);
+              delete body;
+
+            }
+          }
+          else if (json_line["command"].get<string>().compare("set") == 0) {
+            if (json_line["id"].get<string>().compare("sleep_time") == 0) {
+              sleep_time = json_line["value"].get<int>();
+            }
           }
         }
       }
@@ -248,7 +198,9 @@ int main(int argc, char** argv)
     //   std::cout << "- after sleep" << std::endl;
     ///-----stepsimulation_start-----
     // for (i = 0; i < 150; i++)
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    // std::this_thread::sleep_for(std::chrono::milliseconds(16));
+    // std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time));
 
     {
       dynamicsWorld->stepSimulation(1.f / 60.f, 10);
