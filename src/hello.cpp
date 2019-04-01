@@ -15,6 +15,8 @@ subject to the following restrictions:
 
 ///-----includes_start-----
 #include "btBulletDynamicsCommon.h"
+#include "BulletDynamics/ConstraintSolver/btGeneric6DofSpring2Constraint.h"
+
 #include <stdio.h>
 
 #include <iostream>
@@ -176,6 +178,52 @@ int main(int argc, char** argv)
               delete body;
 
             }
+          }
+          else if (json_line["command"].get<string>().compare("joint") == 0) {
+            map<string, pair<btRigidBody*,json>>::iterator it1 = bodyMapPair.find(json_line["id1"].get<string>());
+            map<string, pair<btRigidBody*,json>>::iterator it2 = bodyMapPair.find(json_line["id2"].get<string>());
+            if ( (it1 != bodyMapPair.end())  && (it2 != bodyMapPair.end())  ) {
+              btRigidBody* body1 = it1->second.first;
+              btRigidBody* body2 = it2->second.first;
+              // btVector3 pivotInA(0, 0, 0);
+              // btVector3 pivotInB(0, 0, 0);
+              btTransform pivotInA(btQuaternion::getIdentity(), btVector3(0, 0, 0));  //par body's COM to cur body's COM offset
+              btTransform pivotInB(btQuaternion::getIdentity(), btVector3(0, 0, 0));   //cur body's COM to cur body's PIV offset
+
+              btGeneric6DofSpring2Constraint* fixed = new btGeneric6DofSpring2Constraint(
+                  *body1, 
+                  *body2,
+                  pivotInA, 
+                  pivotInB
+               );
+              // m_dynamicsWorld->addConstraint(con, true);
+              dynamicsWorld->addConstraint(fixed, true);
+            }
+
+
+			// 	btTransform pivotInA(btQuaternion::getIdentity(), btVector3(0, -radius, 0));  //par body's COM to cur body's COM offset
+			// 	btTransform pivotInB(btQuaternion::getIdentity(), btVector3(0, radius, 0));   //cur body's COM to cur body's PIV offset
+			// 	btGeneric6DofSpring2Constraint* fixed = new btGeneric6DofSpring2Constraint(*prevBody, *linkBody,
+			// 																			   pivotInA, pivotInB);
+			// 	fixed->setLinearLowerLimit(btVector3(0, 0, 0));
+			// 	fixed->setLinearUpperLimit(btVector3(0, 0, 0));
+			// 	fixed->setAngularLowerLimit(btVector3(0, 0, 0));
+			// 	fixed->setAngularUpperLimit(btVector3(0, 0, 0));
+      //
+			// 	con = fixed;
+			// }
+			// btAssert(con);
+			// if (con)
+			// {
+			// 	btJointFeedback* fb = new btJointFeedback();
+			// 	m_jointFeedback.push_back(fb);
+			// 	con->setJointFeedback(fb);
+      //
+			// 	m_dynamicsWorld->addConstraint(con, true);
+			// }
+			// prevBody = linkBody;
+
+
           }
           else if (json_line["command"].get<string>().compare("set") == 0) {
             if (json_line["id"].get<string>().compare("sleep_time") == 0) {
