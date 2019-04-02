@@ -82,7 +82,8 @@ int main(int argc, char** argv)
   fds.events = POLLIN;
   int poll_return;
 
-  int sleep_time = 2000;
+  // int sleep_time = 2000;
+  int sleep_time = 16;
 
   deque<string> line_deque;
 
@@ -185,11 +186,20 @@ int main(int argc, char** argv)
             if ( (it1 != bodyMapPair.end())  && (it2 != bodyMapPair.end())  ) {
               btRigidBody* body1 = it1->second.first;
               btRigidBody* body2 = it2->second.first;
-              // btVector3 pivotInA(0, 0, 0);
-              // btVector3 pivotInB(0, 0, 0);
-              btTransform pivotInA(btQuaternion::getIdentity(), btVector3(0, 0, 0));  //par body's COM to cur body's COM offset
-              btTransform pivotInB(btQuaternion::getIdentity(), btVector3(0, 0, 0));   //cur body's COM to cur body's PIV offset
-
+              btTransform pivotInA(btQuaternion::getIdentity(), 
+                  btVector3(
+                    json_line["pos1"][0].get<float>(),
+                    json_line["pos1"][1].get<float>(),
+                    json_line["pos1"][2].get<float>()
+                    )
+                  );  
+              btTransform pivotInB(btQuaternion::getIdentity(), 
+                  btVector3(
+                    json_line["pos2"][0].get<float>(),
+                    json_line["pos2"][1].get<float>(),
+                    json_line["pos2"][2].get<float>()
+                    )
+                  );  
               btGeneric6DofSpring2Constraint* fixed = new btGeneric6DofSpring2Constraint(
                   *body1, 
                   *body2,
@@ -197,7 +207,15 @@ int main(int argc, char** argv)
                   pivotInB
                );
               // m_dynamicsWorld->addConstraint(con, true);
+              fixed->setLinearLowerLimit(btVector3(0, 0, 0));
+              fixed->setLinearUpperLimit(btVector3(0, 0, 0));
+              fixed->setAngularLowerLimit(btVector3(0, 0, 0));
+              fixed->setAngularUpperLimit(btVector3(0, 0, 0));
+
+
               dynamicsWorld->addConstraint(fixed, true);
+
+
             }
 
 

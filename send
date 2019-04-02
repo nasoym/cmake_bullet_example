@@ -42,6 +42,14 @@ elif [ "$1" = "single" ];then shift ##
 " \
  | socat - TCP:localhost:9999
 
+elif [ "$1" = "joint" ];then shift ##
+  echo -ne "\
+{\"command\":\"create\",\"id\":\"abc\",\"mass\":1,\"size\":[1,1,1],\"pos\":[0,0,10]}
+{\"command\":\"create\",\"id\":\"def\",\"mass\":1,\"size\":[1,1,1],\"pos\":[0,0,10]}
+{\"command\":\"joint\",\"id1\":\"def\",\"id2\":\"abc\",\"pos1\":[0,2,0],\"pos2\":[0,-2,0]}
+" \
+ | socat - TCP:localhost:9999
+
 elif [ "$1" = "delete" ];then shift ##
   id="$1"; shift
   echo -ne "\
