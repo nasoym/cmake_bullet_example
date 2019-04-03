@@ -206,12 +206,23 @@ int main(int argc, char** argv)
                   pivotInA, 
                   pivotInB
                );
-              // m_dynamicsWorld->addConstraint(con, true);
               fixed->setLinearLowerLimit(btVector3(0, 0, 0));
               fixed->setLinearUpperLimit(btVector3(0, 0, 0));
               fixed->setAngularLowerLimit(btVector3(0, 0, 0));
               fixed->setAngularUpperLimit(btVector3(0, 0, 0));
 
+              fixed->setLimit(0, 0, 0);
+              fixed->setLimit(1, 0, 0);
+              fixed->setLimit(2, 0, 0);
+              fixed->setLimit(3, 0, 0);
+              fixed->setLimit(4, 0, 0);
+              fixed->setLimit(5, 0, 0);
+
+              // fixed->setLimit(3, 1, -1);
+              fixed->setLimit(3, -0.1, 0.1);
+
+              fixed->enableSpring(0, true);
+              fixed->setStiffness(0, 100);
 
               dynamicsWorld->addConstraint(fixed, true);
 

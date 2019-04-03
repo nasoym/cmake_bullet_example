@@ -43,10 +43,12 @@ elif [ "$1" = "single" ];then shift ##
  | socat - TCP:localhost:9999
 
 elif [ "$1" = "joint" ];then shift ##
+  id1="${RANDOM}1"
+  id2="${RANDOM}2"
   echo -ne "\
-{\"command\":\"create\",\"id\":\"abc\",\"mass\":1,\"size\":[1,1,1],\"pos\":[0,0,10]}
-{\"command\":\"create\",\"id\":\"def\",\"mass\":1,\"size\":[1,1,1],\"pos\":[0,0,10]}
-{\"command\":\"joint\",\"id1\":\"def\",\"id2\":\"abc\",\"pos1\":[0,2,0],\"pos2\":[0,-2,0]}
+{\"command\":\"create\",\"id\":\"${id1}\",\"mass\":1,\"size\":[1,1,3],\"pos\":[0,0,10]}
+{\"command\":\"create\",\"id\":\"${id2}\",\"mass\":1,\"size\":[1,1,3],\"pos\":[0,0,10]}
+{\"command\":\"joint\",\"id1\":\"${id1}\",\"id2\":\"${id2}\",\"pos1\":[0,0,1.5],\"pos2\":[0,0,-1.5]}
 " \
  | socat - TCP:localhost:9999
 
@@ -67,10 +69,10 @@ elif [ "$1" = "set" ];then shift ##
 
 elif [ "$1" = "stack" ];then shift ##
   echo -ne "\
-{\"command\":\"create\",\"id\":\"${RANDOM}\",\"mass\":1,\"size\":[1,1,1],\"pos\":[1,0,20]}
-{\"command\":\"create\",\"id\":\"${RANDOM}\",\"mass\":1,\"size\":[1,1,1],\"pos\":[1,0,21]}
-{\"command\":\"create\",\"id\":\"${RANDOM}\",\"mass\":1,\"size\":[1,1,1],\"pos\":[1,0,22]}
-{\"command\":\"create\",\"id\":\"${RANDOM}\",\"mass\":1,\"size\":[1,1,1],\"pos\":[1,0,23]}
+{\"command\":\"create\",\"id\":\"${RANDOM}\",\"mass\":1,\"size\":[1,1,1],\"pos\":[0,0,20]}
+{\"command\":\"create\",\"id\":\"${RANDOM}\",\"mass\":1,\"size\":[1,1,1],\"pos\":[0,0,21]}
+{\"command\":\"create\",\"id\":\"${RANDOM}\",\"mass\":1,\"size\":[1,1,1],\"pos\":[0,0,22]}
+{\"command\":\"create\",\"id\":\"${RANDOM}\",\"mass\":1,\"size\":[1,1,1],\"pos\":[0,0,23]}
 " \
  | socat - TCP:localhost:9999
 
