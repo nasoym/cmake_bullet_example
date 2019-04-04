@@ -35,6 +35,8 @@ subject to the following restrictions:
 
 using namespace std;
 using json = nlohmann::json;
+const double PI = 3.1415926535897932384626433832795028841972;
+
 
 /// This is a Hello World program for running a basic Bullet physics simulation
 
@@ -206,23 +208,71 @@ int main(int argc, char** argv)
                   pivotInA, 
                   pivotInB
                );
-              fixed->setLinearLowerLimit(btVector3(0, 0, 0));
-              fixed->setLinearUpperLimit(btVector3(0, 0, 0));
-              fixed->setAngularLowerLimit(btVector3(0, 0, 0));
-              fixed->setAngularUpperLimit(btVector3(0, 0, 0));
+              // fixed->setLinearLowerLimit(btVector3(0, 0, 0));
+              // fixed->setLinearUpperLimit(btVector3(0, 0, 0));
+              // fixed->setAngularLowerLimit(
+              //     btVector3(
+              //       json_line["limitlower"][0].get<float>(),
+              //       json_line["limitlower"][1].get<float>(),
+              //       json_line["limitlower"][2].get<float>()
+              //       )
+              //     );
+              // fixed->setAngularUpperLimit(
+              //     btVector3(
+              //       json_line["limitupper"][0].get<float>(),
+              //       json_line["limitupper"][1].get<float>(),
+              //       json_line["limitupper"][2].get<float>()
+              //       )
+              //     );
 
-              fixed->setLimit(0, 0, 0);
-              fixed->setLimit(1, 0, 0);
-              fixed->setLimit(2, 0, 0);
-              fixed->setLimit(3, 0, 0);
-              fixed->setLimit(4, 0, 0);
-              fixed->setLimit(5, 0, 0);
+              // fixed->setLimit(0, 0, 0);
+              // fixed->setLimit(1, 0, 0);
+              // fixed->setLimit(2, 0, 0);
+              // fixed->setLimit(3, 0, 0);
+              // fixed->setLimit(4, 0, 0);
+              // fixed->setLimit(5, 0, 0);
+              // fixed->setLimit(0,
+              //   json_line["limits"][0][0].get<float>(),
+              //   json_line["limits"][0][1].get<float>()
+              //   );
+              for (int i = 0; i <= 5; ++i) {
+                if ( 
+                    (json_line["limits"][i].find("lower") != json_line["limits"][i].end()) &&
+                    (json_line["limits"][i].find("lower") != json_line["limits"][i].end())  
+                  ) {
+                  fixed->setLimit(i,
+                    json_line["limits"][i]["lower"].get<float>(),
+                    json_line["limits"][i]["upper"].get<float>()
+                    );
+                } else {
+                  fixed->setLimit(i,0,0);
+                }
+                if (json_line["limits"][i].find("stiffness") != json_line["limits"][i].end()) {
+                  fixed->setStiffness(i, 
+                    json_line["limits"][i]["stiffness"].get<float>()
+                      );
+                }
+                if (json_line["limits"][i].find("spring") != json_line["limits"][i].end()) {
+                  fixed->enableSpring(i, true);
+                }
+                if (json_line["limits"][i].find("damping") != json_line["limits"][i].end()) {
+                  fixed->setDamping(i, 
+                    json_line["limits"][i]["damping"].get<float>()
+                      );
+                }
+
+		// pGen6DOFSpring->enableSpring(0, true);
+		// pGen6DOFSpring->setStiffness(0, 39.478f);
+		// pGen6DOFSpring->setDamping(0, 0.5f);
+
+
+              }
 
               // fixed->setLimit(3, 1, -1);
-              fixed->setLimit(3, -0.1, 0.1);
+              // fixed->setLimit(3, -0.1, 0.1);
 
-              fixed->enableSpring(0, true);
-              fixed->setStiffness(0, 100);
+              // fixed->enableSpring(0, true);
+              // fixed->setStiffness(0, 100);
 
               dynamicsWorld->addConstraint(fixed, true);
 
@@ -301,8 +351,8 @@ int main(int argc, char** argv)
       //
 
       map<string, pair<btRigidBody*,json>>::iterator it = bodyMapPair.begin();
-      if(it != bodyMapPair.end()) {
         printf("[");
+      if(it != bodyMapPair.end()) {
 
         while(it != bodyMapPair.end())
         {
@@ -341,10 +391,10 @@ int main(int argc, char** argv)
             printf (",");
           }
         }
-        printf("]\n");
-        fflush(stdout);
 
       }
+        printf("]\n");
+        fflush(stdout);
 
     }
 
