@@ -67,6 +67,19 @@ elif [ "$1" = "joint" ];then shift ##
 
 echo "$id1 $id2"
 
+elif [ "$1" = "joint2" ];then shift ##
+  id1="${RANDOM}1"
+  id2="${RANDOM}2"
+  echo -ne "\
+{\"command\":\"create\",\"id\":\"${id1}\",\"mass\":1,\"size\":[1,1,4],\"pos\":[0,0,10]}
+{\"command\":\"create\",\"id\":\"${id2}\",\"mass\":1,\"size\":[1,1,4],\"pos\":[0,0,10]}
+{\"command\":\"joint2\",\"id1\":\"${id1}\",\"id2\":\"${id2}\",\"pos1\":[0,0,2],\"pos2\":[0,0,-2],\"limits\":[0,0,-1]}
+" \
+ | socat - TCP:localhost:9999
+# {\"command\":\"joint\",\"id1\":\"${id1}\",\"id2\":\"${id2}\",\"pos1\":[0,0,1.5],\"pos2\":[0,0,-1.5],\"limitlower\":[0,1,0],\"limitupper\":[0,-1,0]}
+
+echo "$id1 $id2"
+
 elif [ "$1" = "delete" ];then shift ##
   id="$1"; shift
   echo -ne "\
