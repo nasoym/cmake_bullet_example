@@ -11,5 +11,113 @@ if [[ "${trace:=0}" -eq 1 ]];then
   export trace
 fi
 
-socat TCP-LISTEN:9999,reuseaddr,fork STDOUT | ./build_cmake/hello
+# jq -n -c \
+#   --arg id "$RANDOM" \
+#   '{
+#   command:"create",
+#   id:$id,
+#   mass:1,
+#   size:[5,5,5],
+#   pos:[0,0,20]
+# }' \
+#   | socat - TCP:localhost:9999
 
+if [[ "$#" -eq 0 ]];then
+  :
+  ${0} help
+
+elif [[ "$1" == "help" ]];then shift
+  which bash_scripts >/dev/null && bash_scripts show_commands ${0}
+
+elif [ "$1" = "docker" ];then shift ##
+  docker run --name rabbit -d -p 5672:5672 -p 15672:15672 -p 15674:15674 activiti/rabbitmq-stomp
+
+elif [ "$1" = "run" ];then shift ##
+  ${0} build
+  socat TCP-LISTEN:9999,reuseaddr,fork STDOUT | ./build_cmake/hello \
+    | python3 src/python_pika_write.py
+
+elif [ "$1" = "build" ];then shift ##
+rm -rf build_cmake
+mkdir -p build_cmake 
+cd build_cmake 
+cmake ../ 
+make
+
+
+elif [ "$1" = "base" ];then shift ##
+  echo -ne "\
+{\"command\":\"create\",\"id\":\"${RANDOM}\",\"mass\":0,\"size\":[200,200,10],\"pos\":[0,0,-10]}
+" \
+ | socat - TCP:localhost:9999
+
+elif [ "$1" = "single" ];then shift ##
+  id="$1"; shift
+  echo -ne "\
+{\"command\":\"create\",\"id\":\"${id}\",\"mass\":1,\"size\":[1,1,1],\"pos\":[0,0,10]}
+" \
+ | socat - TCP:localhost:9999
+
+elif [ "$1" = "joint" ];then shift ##
+  id1="${RANDOM}1"
+  id2="${RANDOM}2"
+  id3="${RANDOM}3"
+  id4="${RANDOM}4"
+  id5="${RANDOM}5"
+  id6="${RANDOM}6"
+  echo -ne "\
+{\"command\":\"create\",\"id\":\"${id1}\",\"mass\":1,\"size\":[1,1,4],\"pos\":[0,0,10]}
+{\"command\":\"create\",\"id\":\"${id2}\",\"mass\":1,\"size\":[1,1,4],\"pos\":[0,0,10]}
+{\"command\":\"create\",\"id\":\"${id3}\",\"mass\":1,\"size\":[1,1,4],\"pos\":[0,0,10]}
+{\"command\":\"create\",\"id\":\"${id4}\",\"mass\":1,\"size\":[1,1,4],\"pos\":[0,0,10]}
+{\"command\":\"create\",\"id\":\"${id5}\",\"mass\":1,\"size\":[1,1,4],\"pos\":[0,0,10]}
+{\"command\":\"create\",\"id\":\"${id6}\",\"mass\":1,\"size\":[1,1,4],\"pos\":[0,0,10]}
+{\"command\":\"joint\",\"id1\":\"${id1}\",\"id2\":\"${id2}\",\"pos1\":[0,0,2],\"pos2\":[0,0,-2],\"limits\":[{},{},{},{\"lower\":-2,\"upper\":2,\"spring\":true,\"stiffness\":3,\"damping\":0.1},{\"lower\":-2,\"upper\":2,\"spring\":true,\"stiffness\":3,\"damping\":0.1},{}]}
+{\"command\":\"joint\",\"id1\":\"${id2}\",\"id2\":\"${id3}\",\"pos1\":[0,0,2],\"pos2\":[0,0,-2],\"limits\":[{},{},{},{\"lower\":-2,\"upper\":2,\"spring\":true,\"stiffness\":3,\"damping\":0.1},{\"lower\":-2,\"upper\":2,\"spring\":true,\"stiffness\":3,\"damping\":0.1},{}]}
+{\"command\":\"joint\",\"id1\":\"${id3}\",\"id2\":\"${id4}\",\"pos1\":[0,0,2],\"pos2\":[0,0,-2],\"limits\":[{},{},{},{\"lower\":-2,\"upper\":2,\"spring\":true,\"stiffness\":3,\"damping\":0.1},{\"lower\":-2,\"upper\":2,\"spring\":true,\"stiffness\":3,\"damping\":0.1},{}]}
+{\"command\":\"joint\",\"id1\":\"${id4}\",\"id2\":\"${id5}\",\"pos1\":[0,0,2],\"pos2\":[0,0,-2],\"limits\":[{},{},{},{\"lower\":-2,\"upper\":2,\"spring\":true,\"stiffness\":3,\"damping\":0.1},{\"lower\":-2,\"upper\":2,\"spring\":true,\"stiffness\":3,\"damping\":0.1},{}]}
+{\"command\":\"joint\",\"id1\":\"${id5}\",\"id2\":\"${id6}\",\"pos1\":[0,0,2],\"pos2\":[0,0,-2],\"limits\":[{},{},{},{\"lower\":-2,\"upper\":2,\"spring\":true,\"stiffness\":3,\"damping\":0.1},{\"lower\":-2,\"upper\":2,\"spring\":true,\"stiffness\":3,\"damping\":0.1},{}]}
+" \
+ | socat - TCP:localhost:9999
+# {\"command\":\"joint\",\"id1\":\"${id1}\",\"id2\":\"${id2}\",\"pos1\":[0,0,1.5],\"pos2\":[0,0,-1.5],\"limitlower\":[0,1,0],\"limitupper\":[0,-1,0]}
+
+echo "$id1 $id2"
+
+elif [ "$1" = "joint2" ];then shift ##
+  id1="${RANDOM}1"
+  id2="${RANDOM}2"
+  echo -ne "\
+{\"command\":\"create\",\"id\":\"${id1}\",\"mass\":1,\"size\":[1,4,1],\"pos\":[0,0,10]}
+{\"command\":\"create\",\"id\":\"${id2}\",\"mass\":1,\"size\":[1,4,1],\"pos\":[0,0,10]}
+{\"command\":\"joint2\",\"id1\":\"${id1}\",\"id2\":\"${id2}\",\"pos1\":[0,2,0],\"pos2\":[0,-2,0],\"limits\":[0.9,0.9,0]}
+" \
+ | socat - TCP:localhost:9999
+# {\"command\":\"joint\",\"id1\":\"${id1}\",\"id2\":\"${id2}\",\"pos1\":[0,0,1.5],\"pos2\":[0,0,-1.5],\"limitlower\":[0,1,0],\"limitupper\":[0,-1,0]}
+
+echo "$id1 $id2"
+
+elif [ "$1" = "delete" ];then shift ##
+  id="$1"; shift
+  echo -ne "\
+{\"command\":\"delete\",\"id\":\"${id}\"}
+" \
+ | socat - TCP:localhost:9999
+
+elif [ "$1" = "set" ];then shift ##
+  : ${id="sleep_time"}
+  : ${value="100"}
+  echo -ne "\
+{\"command\":\"set\",\"id\":\"${id}\",\"value\":${value}}
+" \
+ | socat - TCP:localhost:9999
+
+elif [ "$1" = "stack" ];then shift ##
+  echo -ne "\
+{\"command\":\"create\",\"id\":\"${RANDOM}\",\"mass\":1,\"size\":[1,1,1],\"pos\":[0,0,20]}
+{\"command\":\"create\",\"id\":\"${RANDOM}\",\"mass\":1,\"size\":[1,1,1],\"pos\":[0,0,21]}
+{\"command\":\"create\",\"id\":\"${RANDOM}\",\"mass\":1,\"size\":[1,1,1],\"pos\":[0,0,22]}
+{\"command\":\"create\",\"id\":\"${RANDOM}\",\"mass\":1,\"size\":[1,1,1],\"pos\":[0,0,23]}
+" \
+ | socat - TCP:localhost:9999
+
+fi

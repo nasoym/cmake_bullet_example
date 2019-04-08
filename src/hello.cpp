@@ -43,6 +43,7 @@ const double PI = 3.1415926535897932384626433832795028841972;
 int main(int argc, char** argv)
 {
 	///-----includes_end-----
+	b3Clock clock;
 
 	int i;
 	///-----initialization_start-----
@@ -62,6 +63,10 @@ int main(int argc, char** argv)
 	btDiscreteDynamicsWorld* dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, collisionConfiguration);
 
 	dynamicsWorld->setGravity(btVector3(0, 0, -10));
+	// dynamicsWorld->getSolverInfo().m_globalCfm = btScalar(1e-4);  //todo: what value is good?
+  std::cerr << "old numIterations: " << dynamicsWorld->getSolverInfo().m_numIterations << std::endl;
+	dynamicsWorld->getSolverInfo().m_numIterations = 50;  //todo: what value is good?
+
 
 	///-----initialization_end-----
 
@@ -340,7 +345,7 @@ int main(int argc, char** argv)
     std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time));
 
     {
-      dynamicsWorld->stepSimulation(1.f / 60.f, 10);
+      dynamicsWorld->stepSimulation(1.f / 60.f, 10, 1.f / 240.f);
 
       // //print positions of all objects
       // for (int j = dynamicsWorld->getNumCollisionObjects() - 1; j >= 0; j--)
