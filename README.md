@@ -18,4 +18,4 @@ Also increasing solver iterations count helps a bit:
 
 btContactSolverInfo& info = dynamicsWorld->getSolverInfo();
 info.m_numIterations = 50;
-
+https://pybullet.org/Bullet/BulletFull/classbtTypedConstraint.html

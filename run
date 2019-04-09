@@ -33,16 +33,15 @@ elif [ "$1" = "docker" ];then shift ##
   docker run --name rabbit -d -p 5672:5672 -p 15672:15672 -p 15674:15674 activiti/rabbitmq-stomp
 
 elif [ "$1" = "run" ];then shift ##
-  ${0} build
   socat TCP-LISTEN:9999,reuseaddr,fork STDOUT | ./build_cmake/hello \
     | python3 src/python_pika_write.py
 
 elif [ "$1" = "build" ];then shift ##
-rm -rf build_cmake
-mkdir -p build_cmake 
-cd build_cmake 
-cmake ../ 
-make
+  rm -rf build_cmake
+  mkdir -p build_cmake 
+  cd build_cmake 
+  cmake ../ 
+  make
 
 
 elif [ "$1" = "base" ];then shift ##
@@ -87,9 +86,9 @@ elif [ "$1" = "joint2" ];then shift ##
   id1="${RANDOM}1"
   id2="${RANDOM}2"
   echo -ne "\
-{\"command\":\"create\",\"id\":\"${id1}\",\"mass\":1,\"size\":[1,4,1],\"pos\":[0,0,10]}
-{\"command\":\"create\",\"id\":\"${id2}\",\"mass\":1,\"size\":[1,4,1],\"pos\":[0,0,10]}
-{\"command\":\"joint2\",\"id1\":\"${id1}\",\"id2\":\"${id2}\",\"pos1\":[0,2,0],\"pos2\":[0,-2,0],\"limits\":[0.9,0.9,0]}
+{\"command\":\"create\",\"id\":\"${id1}\",\"mass\":1,\"size\":[1,1,4],\"pos\":[0,0,24]}
+{\"command\":\"create\",\"id\":\"${id2}\",\"mass\":1,\"size\":[1,1,4],\"pos\":[0,0,20]}
+{\"command\":\"joint2\",\"id1\":\"${id1}\",\"id2\":\"${id2}\",\"pos1\":[0,0,2],\"pos2\":[0,0,-2],\"limits\":[0,0.9,0.9,1.0,0.3,1.0],\"damping\":0.01}
 " \
  | socat - TCP:localhost:9999
 # {\"command\":\"joint\",\"id1\":\"${id1}\",\"id2\":\"${id2}\",\"pos1\":[0,0,1.5],\"pos2\":[0,0,-1.5],\"limitlower\":[0,1,0],\"limitupper\":[0,-1,0]}
@@ -103,9 +102,17 @@ elif [ "$1" = "delete" ];then shift ##
 " \
  | socat - TCP:localhost:9999
 
+elif [ "$1" = "clear" ];then shift ##
+  echo -ne "\
+{\"command\":\"clear\"}
+" \
+ | socat - TCP:localhost:9999
+
 elif [ "$1" = "set" ];then shift ##
-  : ${id="sleep_time"}
-  : ${value="100"}
+  # : ${id="sleep_time"}
+  # : ${value="100"}
+  id="$1";shift
+  value="$1"; shift
   echo -ne "\
 {\"command\":\"set\",\"id\":\"${id}\",\"value\":${value}}
 " \

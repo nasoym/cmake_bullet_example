@@ -43,7 +43,7 @@ const double PI = 3.1415926535897932384626433832795028841972;
 int main(int argc, char** argv)
 {
 	///-----includes_end-----
-	b3Clock clock;
+	// b3Clock clock;
 
 	int i;
 	///-----initialization_start-----
@@ -64,8 +64,8 @@ int main(int argc, char** argv)
 
 	dynamicsWorld->setGravity(btVector3(0, 0, -10));
 	// dynamicsWorld->getSolverInfo().m_globalCfm = btScalar(1e-4);  //todo: what value is good?
-  std::cerr << "old numIterations: " << dynamicsWorld->getSolverInfo().m_numIterations << std::endl;
-	dynamicsWorld->getSolverInfo().m_numIterations = 50;  //todo: what value is good?
+  // std::cerr << "old numIterations: " << dynamicsWorld->getSolverInfo().m_numIterations << std::endl;
+	// dynamicsWorld->getSolverInfo().m_numIterations = 50;  //todo: what value is good?
 
 
 	///-----initialization_end-----
@@ -186,6 +186,29 @@ int main(int argc, char** argv)
               delete body;
 
             }
+          }
+          else if (json_line["command"].get<string>().compare("clear") == 0) {
+
+            // map<string, pair<btRigidBody*,json>>::iterator it = bodyMapPair.begin();
+            //
+            // while(it != bodyMapPair.end())
+            // {
+            //   btRigidBody* body = it->second.first;
+            //   dynamicsWorld->removeRigidBody(body);
+            //
+            //   if (body && body->getMotionState()) {
+            //     delete body->getMotionState();
+            //   }
+            //   bodyMapPair.erase(it);
+            //   delete body;
+            //
+            //
+            // }
+            //
+
+
+
+
           }
           else if (json_line["command"].get<string>().compare("joint") == 0) {
             map<string, pair<btRigidBody*,json>>::iterator it1 = bodyMapPair.find(json_line["id1"].get<string>());
@@ -308,12 +331,28 @@ int main(int argc, char** argv)
               btConeTwistConstraint* fixed = new btConeTwistConstraint(*body1, *body2, pivotInA, pivotInB);
 
               if (json_line.find("limits") != json_line.end()) {
-                fixed->setLimit(i,
+                fixed->setLimit(
                   json_line["limits"][0].get<float>(),
                   json_line["limits"][1].get<float>(),
-                  json_line["limits"][2].get<float>()
+                  json_line["limits"][2].get<float>(),
+                  json_line["limits"][3].get<float>(),
+                  json_line["limits"][4].get<float>(),
+                  json_line["limits"][5].get<float>()
                   );
+
+              // setLimit (btScalar _swingSpan1, btScalar _swingSpan2, btScalar _twistSpan, 
+                // btScalar _softness=1.f, 
+                // btScalar _biasFactor=0.3f, 
+                // btScalar _relaxationFactor=1.0f)
+                // setDamping (btScalar damping)
+
               }
+              if (json_line.find("damping") != json_line.end()) {
+                fixed->setDamping(json_line["damping"].get<float>());
+              }
+              //damping: 0.01
+              // std::cerr << "damping: " << fixed->getDamping() << std::endl;
+
               dynamicsWorld->addConstraint(fixed, true);
             }
           }
@@ -322,7 +361,13 @@ int main(int argc, char** argv)
           else if (json_line["command"].get<string>().compare("set") == 0) {
             if (json_line["id"].get<string>().compare("sleep_time") == 0) {
               sleep_time = json_line["value"].get<int>();
+              std::cerr << "set sleep_time: " << json_line["value"].get<int>() << std::endl;
             }
+            else if (json_line["id"].get<string>().compare("solver_iterations") == 0) {
+              dynamicsWorld->getSolverInfo().m_numIterations = json_line["value"].get<int>();
+              std::cerr << "set solver_iterations: " << json_line["value"].get<int>() << std::endl;
+            }
+
           }
         }
       }
