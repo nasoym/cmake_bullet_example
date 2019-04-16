@@ -314,14 +314,26 @@ int main(int argc, char** argv)
             if ( (it1 != bodyMapPair.end())  && (it2 != bodyMapPair.end())  ) {
               btRigidBody* body1 = it1->second.first;
               btRigidBody* body2 = it2->second.first;
-              btTransform pivotInA(btQuaternion::getIdentity(), 
+              btTransform pivotInA(
+                  btQuaternion(
+                    json_line["rot1"][0].get<float>(),
+                    json_line["rot1"][1].get<float>(),
+                    json_line["rot1"][2].get<float>(),
+                    json_line["rot1"][3].get<float>()
+                  ), 
                   btVector3(
                     json_line["pos1"][0].get<float>(),
                     json_line["pos1"][1].get<float>(),
                     json_line["pos1"][2].get<float>()
                     )
                   );  
-              btTransform pivotInB(btQuaternion::getIdentity(), 
+              btTransform pivotInB(
+                  btQuaternion(
+                    json_line["rot2"][0].get<float>(),
+                    json_line["rot2"][1].get<float>(),
+                    json_line["rot2"][2].get<float>(),
+                    json_line["rot2"][3].get<float>()
+                  ), 
                   btVector3(
                     json_line["pos2"][0].get<float>(),
                     json_line["pos2"][1].get<float>(),
@@ -354,6 +366,11 @@ int main(int argc, char** argv)
               // std::cerr << "damping: " << fixed->getDamping() << std::endl;
 
               dynamicsWorld->addConstraint(fixed, true);
+
+              fixed->enableMotor(true);
+              fixed->setMaxMotorImpulseNormalized(0.01); 
+              fixed->setMotorTargetInConstraintSpace(btQuaternion(0.5,0.5,0.5,0.5));
+
             }
           }
 

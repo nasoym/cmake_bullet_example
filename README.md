@@ -6,11 +6,17 @@ https://stackoverflow.com/questions/12778229/what-does-step-mean-in-stepsimulati
 
 
 ## todos
-  * delete collision shape
-  * create plane/sphere
-  * set more values
-  * ?? read set values (publish to different channel)
-  * create with joint
+    * delete collision shape
+    * create plane/sphere
+
+  * joint settings
+  * simulation settings
+  * del joint
+
+  * motor force
+
+  * simulation step time
+
 
 https://stackoverflow.com/questions/45691950/how-to-achieve-maximum-simulation-accuracy-in-bullet
 gDynamicsWorld->stepSimulation(SIMULATION_STEP_TIME, 1, 1.0f/60.0f);
