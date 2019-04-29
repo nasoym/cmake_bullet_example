@@ -58,43 +58,33 @@ elif [ "$1" = "single" ];then shift ##
  | socat - TCP:localhost:9999
 
 elif [ "$1" = "joint" ];then shift ##
-  id1="${RANDOM}1"
-  id2="${RANDOM}2"
-  id3="${RANDOM}3"
-  id4="${RANDOM}4"
-  id5="${RANDOM}5"
-  id6="${RANDOM}6"
-  echo -ne "\
-{\"command\":\"create\",\"id\":\"${id1}\",\"mass\":1,\"size\":[1,1,4],\"pos\":[0,0,10]}
-{\"command\":\"create\",\"id\":\"${id2}\",\"mass\":1,\"size\":[1,1,4],\"pos\":[0,0,10]}
-{\"command\":\"create\",\"id\":\"${id3}\",\"mass\":1,\"size\":[1,1,4],\"pos\":[0,0,10]}
-{\"command\":\"create\",\"id\":\"${id4}\",\"mass\":1,\"size\":[1,1,4],\"pos\":[0,0,10]}
-{\"command\":\"create\",\"id\":\"${id5}\",\"mass\":1,\"size\":[1,1,4],\"pos\":[0,0,10]}
-{\"command\":\"create\",\"id\":\"${id6}\",\"mass\":1,\"size\":[1,1,4],\"pos\":[0,0,10]}
-{\"command\":\"joint\",\"id1\":\"${id1}\",\"id2\":\"${id2}\",\"pos1\":[0,0,2],\"pos2\":[0,0,-2],\"limits\":[{},{},{},{\"lower\":-2,\"upper\":2,\"spring\":true,\"stiffness\":3,\"damping\":0.1},{\"lower\":-2,\"upper\":2,\"spring\":true,\"stiffness\":3,\"damping\":0.1},{}]}
-{\"command\":\"joint\",\"id1\":\"${id2}\",\"id2\":\"${id3}\",\"pos1\":[0,0,2],\"pos2\":[0,0,-2],\"limits\":[{},{},{},{\"lower\":-2,\"upper\":2,\"spring\":true,\"stiffness\":3,\"damping\":0.1},{\"lower\":-2,\"upper\":2,\"spring\":true,\"stiffness\":3,\"damping\":0.1},{}]}
-{\"command\":\"joint\",\"id1\":\"${id3}\",\"id2\":\"${id4}\",\"pos1\":[0,0,2],\"pos2\":[0,0,-2],\"limits\":[{},{},{},{\"lower\":-2,\"upper\":2,\"spring\":true,\"stiffness\":3,\"damping\":0.1},{\"lower\":-2,\"upper\":2,\"spring\":true,\"stiffness\":3,\"damping\":0.1},{}]}
-{\"command\":\"joint\",\"id1\":\"${id4}\",\"id2\":\"${id5}\",\"pos1\":[0,0,2],\"pos2\":[0,0,-2],\"limits\":[{},{},{},{\"lower\":-2,\"upper\":2,\"spring\":true,\"stiffness\":3,\"damping\":0.1},{\"lower\":-2,\"upper\":2,\"spring\":true,\"stiffness\":3,\"damping\":0.1},{}]}
-{\"command\":\"joint\",\"id1\":\"${id5}\",\"id2\":\"${id6}\",\"pos1\":[0,0,2],\"pos2\":[0,0,-2],\"limits\":[{},{},{},{\"lower\":-2,\"upper\":2,\"spring\":true,\"stiffness\":3,\"damping\":0.1},{\"lower\":-2,\"upper\":2,\"spring\":true,\"stiffness\":3,\"damping\":0.1},{}]}
-" \
- | socat - TCP:localhost:9999
-# {\"command\":\"joint\",\"id1\":\"${id1}\",\"id2\":\"${id2}\",\"pos1\":[0,0,1.5],\"pos2\":[0,0,-1.5],\"limitlower\":[0,1,0],\"limitupper\":[0,-1,0]}
-
-echo "$id1 $id2"
-
-elif [ "$1" = "joint2" ];then shift ##
+  id="${RANDOM}"
   id1="${RANDOM}1"
   id2="${RANDOM}2"
   echo -ne "\
 {\"command\":\"create\",\"id\":\"${id1}\",\"mass\":1,\"size\":[1,1,4],\"pos\":[0,0,24]}
 {\"command\":\"create\",\"id\":\"${id2}\",\"mass\":1,\"size\":[1,1,4],\"pos\":[0,0,20]}
-{\"command\":\"joint2\",\"id1\":\"${id1}\",\"id2\":\"${id2}\",\"pos1\":[0,0,2],\"rot1\":[0,0,0,1],\"pos2\":[0,0,-2],\"rot2\":[0,0,0,1],\"limits\":[0.0,2.4,2.4,0.0,0.3,1.0],\"damping\":0.01}
+{\"command\":\"joint\",\"id\":\"${id}\",\"id1\":\"${id1}\",\"id2\":\"${id2}\",\"pos1\":[0,0,2],\"rot1\":[0,0,0,1],\"pos2\":[0,0,-2],\"rot2\":[0,0,0,1],\"limits\":[0.0,2.4,2.4,0.0,0.3,1.0],\"damping\":0.01}
 " \
  | socat - TCP:localhost:9999
 # {\"command\":\"joint\",\"id1\":\"${id1}\",\"id2\":\"${id2}\",\"pos1\":[0,0,1.5],\"pos2\":[0,0,-1.5],\"limitlower\":[0,1,0],\"limitupper\":[0,-1,0]}
 # {\"command\":\"joint2\",\"id1\":\"${id1}\",\"id2\":\"${id2}\",\"pos1\":[0,0,2],\"rot1\":[0,0,0,1],\"pos2\":[0,0,-2],\"rot2\":[0,0,0,1],\"limits\":[0,1.6,0.1,1.0,0.3,1.0],\"damping\":0.01}
 
-echo "$id1 $id2"
+echo "$id $id1 $id2"
+
+elif [ "$1" = "joint_motor" ];then shift ##
+  id="$1"; shift
+  echo -ne "\
+{\"command\":\"joint_motor\",\"id\":\"${id}\",\"enable\":true,\"impulse\":100.0,\"target\":[0.5,0.5,0.5,0.5]}
+" \
+ | socat - TCP:localhost:9999
+
+elif [ "$1" = "delete_joint" ];then shift ##
+  id="$1"; shift
+  echo -ne "\
+{\"command\":\"delete_joint\",\"id\":\"${id}\"}
+" \
+ | socat - TCP:localhost:9999
 
 elif [ "$1" = "delete" ];then shift ##
   id="$1"; shift
