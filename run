@@ -64,7 +64,7 @@ elif [ "$1" = "joint" ];then shift ##
   echo -ne "\
 {\"command\":\"create\",\"id\":\"${id1}\",\"mass\":1,\"size\":[1,1,4],\"pos\":[0,0,24]}
 {\"command\":\"create\",\"id\":\"${id2}\",\"mass\":1,\"size\":[1,1,4],\"pos\":[0,0,20]}
-{\"command\":\"joint\",\"id\":\"${id}\",\"id1\":\"${id1}\",\"id2\":\"${id2}\",\"pos1\":[0,0,2],\"rot1\":[0,0,0,1],\"pos2\":[0,0,-2],\"rot2\":[0,0,0,1],\"limits\":[0.0,2.4,2.4,0.0,0.3,1.0],\"damping\":0.01}
+{\"command\":\"joint\",\"id\":\"${id}\",\"id1\":\"${id1}\",\"id2\":\"${id2}\",\"pos1\":[0,0,2],\"rot1\":[0,0,0,1],\"pos2\":[0,0,-2],\"rot2\":[0,0,0,1],\"limits\":[0.0,1.5,0.0,0.0,0.3,1.0],\"damping\":0.01}
 " \
  | socat - TCP:localhost:9999
 # {\"command\":\"joint\",\"id1\":\"${id1}\",\"id2\":\"${id2}\",\"pos1\":[0,0,1.5],\"pos2\":[0,0,-1.5],\"limitlower\":[0,1,0],\"limitupper\":[0,-1,0]}
@@ -75,11 +75,12 @@ echo "$id $id1 $id2"
 elif [ "$1" = "joint_motor" ];then shift ##
   id="$1"; shift
   echo -ne "\
-{\"command\":\"joint_motor\",\"id\":\"${id}\",\"enable\":true,\"impulse\":100.0,\"target\":[0.5,0.5,0.5,0.5]}
+{\"command\":\"joint_motor\",\"id\":\"${id}\",\"enable\":true,\"impulse\":10.1,\"target\":[0.5,0.5,0.5,0.5]}
 " \
  | socat - TCP:localhost:9999
+# {\"command\":\"joint_motor\",\"id\":\"${id}\",\"enable\":true,\"impulse\":0.1,\"target\":[0.5,0.5,0.5,0.5]}
 
-elif [ "$1" = "delete_joint" ];then shift ##
+elif [ "$1" = "joint_delete" ];then shift ##
   id="$1"; shift
   echo -ne "\
 {\"command\":\"delete_joint\",\"id\":\"${id}\"}
@@ -115,6 +116,11 @@ elif [ "$1" = "stack" ];then shift ##
 {\"command\":\"create\",\"id\":\"${RANDOM}\",\"mass\":1,\"size\":[1,1,1],\"pos\":[0,0,21]}
 {\"command\":\"create\",\"id\":\"${RANDOM}\",\"mass\":1,\"size\":[1,1,1],\"pos\":[0,0,22]}
 {\"command\":\"create\",\"id\":\"${RANDOM}\",\"mass\":1,\"size\":[1,1,1],\"pos\":[0,0,23]}
+{\"command\":\"create\",\"id\":\"${RANDOM}\",\"mass\":1,\"size\":[1,1,1],\"pos\":[0,0,24]}
+{\"command\":\"create\",\"id\":\"${RANDOM}\",\"mass\":1,\"size\":[1,1,1],\"pos\":[0,0,25]}
+{\"command\":\"create\",\"id\":\"${RANDOM}\",\"mass\":1,\"size\":[1,1,1],\"pos\":[0,0,26]}
+{\"command\":\"create\",\"id\":\"${RANDOM}\",\"mass\":1,\"size\":[1,1,1],\"pos\":[0,0,27]}
+{\"command\":\"create\",\"id\":\"${RANDOM}\",\"mass\":1,\"size\":[1,1,1],\"pos\":[0,0,28]}
 " \
  | socat - TCP:localhost:9999
 

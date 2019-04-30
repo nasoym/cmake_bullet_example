@@ -5,8 +5,6 @@ https://stackoverflow.com/questions/12778229/what-does-step-mean-in-stepsimulati
 
 ## todos
 
-  * joint id
-  * del joint
   * motor settings
 
   * joint settings

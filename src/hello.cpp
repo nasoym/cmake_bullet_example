@@ -78,7 +78,7 @@ int main(int argc, char** argv)
   map <string,pair<btRigidBody*,json>> bodyMapPair;
 
   map <string,pair<btConeTwistConstraint*,json>> constraintMapPair;
-
+  map <string,json> motorJson;
 
 
   char newline = '\n';
@@ -192,22 +192,22 @@ int main(int argc, char** argv)
           }
           else if (json_line["command"].get<string>().compare("clear") == 0) {
 
-            // map<string, pair<btRigidBody*,json>>::iterator it = bodyMapPair.begin();
-            //
-            // while(it != bodyMapPair.end())
-            // {
-            //   btRigidBody* body = it->second.first;
-            //   dynamicsWorld->removeRigidBody(body);
-            //
-            //   if (body && body->getMotionState()) {
-            //     delete body->getMotionState();
-            //   }
-            //   bodyMapPair.erase(it);
-            //   delete body;
-            //
-            //
-            // }
-            //
+            map<string, pair<btRigidBody*,json>>::iterator it = bodyMapPair.begin();
+
+            while(it != bodyMapPair.end())
+            {
+              btRigidBody* body = it->second.first;
+              dynamicsWorld->removeRigidBody(body);
+
+              if (body && body->getMotionState()) {
+                delete body->getMotionState();
+              }
+              bodyMapPair.erase(it);
+              delete body;
+
+
+            }
+
 
 
 
@@ -282,6 +282,14 @@ int main(int argc, char** argv)
                 //damping: 0.01
                 // std::cerr << "damping: " << fixed->getDamping() << std::endl;
 
+
+                // fixed->enableMotor(true);
+                // fixed->setMaxMotorImpulseNormalized(0.1); 
+                // // fixed->setMaxMotorImpulse(json_line["impulse"].get<float>());
+                // fixed->setMotorTargetInConstraintSpace( btQuaternion(0.5,0.5,0.5,0.5));
+
+
+
                 dynamicsWorld->addConstraint(fixed, true);
 
 
@@ -297,15 +305,20 @@ int main(int argc, char** argv)
           }
           else if (json_line["command"].get<string>().compare("joint_motor") == 0) {
 
+            // map<string, json>::iterator it = motorJson.find(json_line["id"].get<string>());
+            // if(it == motorJson.end()) {
+            //   motorJson.insert(make_pair(json_line["id"].get<string>(),json_line));
+            // } 
             map<string, pair<btConeTwistConstraint*,json>>::iterator it = constraintMapPair.find(json_line["id"].get<string>());
             if(it != constraintMapPair.end()) {
               btConeTwistConstraint* constraint = it->second.first;
 
+              std::cerr << "found constraint for id:" <<  json_line["id"].get<string>() << std::endl;
               // constraint->enableMotor(true);
               constraint->enableMotor(json_line["enable"].get<bool>());
               // constraint->setMaxMotorImpulseNormalized(0.01); 
-              // constraint->setMaxMotorImpulseNormalized(json_line["impulse"].get<float>());
-              constraint->setMaxMotorImpulse(json_line["impulse"].get<float>());
+              constraint->setMaxMotorImpulseNormalized(json_line["impulse"].get<float>());
+              // constraint->setMaxMotorImpulse(json_line["impulse"].get<float>());
               constraint->setMotorTargetInConstraintSpace(
                     //btQuaternion(0.5,0.5,0.5,0.5)
                     btQuaternion(
@@ -364,6 +377,41 @@ int main(int argc, char** argv)
     std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time));
 
     {
+
+
+      map<string, json>::iterator it = motorJson.begin();
+
+      while(it != motorJson.end())
+      {
+        json json_line = it->second;
+        string bodyId = json_line["id"].get<string>();
+        map<string, pair<btConeTwistConstraint*,json>>::iterator constraintIt = constraintMapPair.find(bodyId);
+        if(constraintIt != constraintMapPair.end()) {
+          btConeTwistConstraint* constraint = constraintIt->second.first;
+
+          // std::cerr << "apply motor to body id:" << bodyId << std::endl;
+          constraint->enableMotor(true);
+          // constraint->enableMotor(json_line["enable"].get<bool>());
+          constraint->setMaxMotorImpulseNormalized(1.0); 
+          // constraint->setMaxMotorImpulseNormalized(json_line["impulse"].get<float>());
+          // constraint->setMaxMotorImpulse(json_line["impulse"].get<float>());
+          // constraint->setMaxMotorImpulseNormalized(json_line["impulse"].get<float>());
+          constraint->setMotorTargetInConstraintSpace(
+                btQuaternion(0,0,0,1)
+                //btQuaternion(0.5,0.5,0.5,0.5)
+                // btQuaternion(
+                //   json_line["target"][0].get<float>(),
+                //   json_line["target"][1].get<float>(),
+                //   json_line["target"][2].get<float>(),
+                //   json_line["target"][3].get<float>()
+                // )
+              );
+
+        }
+
+      }
+
+
       dynamicsWorld->stepSimulation(1.f / 60.f, 10, 1.f / 240.f);
 
       // //print positions of all objects
@@ -384,51 +432,53 @@ int main(int argc, char** argv)
       // }
       //
 
-      map<string, pair<btRigidBody*,json>>::iterator it = bodyMapPair.begin();
+      {
+        map<string, pair<btRigidBody*,json>>::iterator it = bodyMapPair.begin();
         printf("[");
-      if(it != bodyMapPair.end()) {
+        if(it != bodyMapPair.end()) {
 
-        while(it != bodyMapPair.end())
-        {
-            // std::cout<<it->first<<" :: "<<it->second<<std::endl;
-
-          // pair<btRigidBody*,json> bla = it->second;
-          // btRigidBody* body = bla.first;
-          btRigidBody* body = it->second.first;
-          btTransform trans;
-          if (body && body->getMotionState())
+          while(it != bodyMapPair.end())
           {
-            body->getMotionState()->getWorldTransform(trans);
-          }
-          printf("{");
-          printf(
-              "\"id\":\"%s\",\"type\":\"box\",\"pos\":[%f,%f,%f],\"rot\":[%f,%f,%f,%f],\"size\":[%f,%f,%f]", 
-              it->first.c_str(), 
-              float(trans.getOrigin().getX()), 
-              float(trans.getOrigin().getY()), 
-              float(trans.getOrigin().getZ()),
-              float(trans.getRotation().getX()), 
-              float(trans.getRotation().getY()), 
-              float(trans.getRotation().getZ()), 
-              float(trans.getRotation().getW()),
-              it->second.second["size"][0].get<float>(),
-              it->second.second["size"][1].get<float>(),
-              it->second.second["size"][2].get<float>()
-              );
-          // printf(
-          //     ",json:%s", 
-          //     it->second.second.dump().c_str()
-          //     );
-          printf("}");
-          it++;
-          if(it != bodyMapPair.end()) {
-            printf (",");
-          }
-        }
+              // std::cout<<it->first<<" :: "<<it->second<<std::endl;
 
-      }
+            // pair<btRigidBody*,json> bla = it->second;
+            // btRigidBody* body = bla.first;
+            btRigidBody* body = it->second.first;
+            btTransform trans;
+            if (body && body->getMotionState())
+            {
+              body->getMotionState()->getWorldTransform(trans);
+            }
+            printf("{");
+            printf(
+                "\"id\":\"%s\",\"type\":\"box\",\"pos\":[%f,%f,%f],\"rot\":[%f,%f,%f,%f],\"size\":[%f,%f,%f]", 
+                it->first.c_str(), 
+                float(trans.getOrigin().getX()), 
+                float(trans.getOrigin().getY()), 
+                float(trans.getOrigin().getZ()),
+                float(trans.getRotation().getX()), 
+                float(trans.getRotation().getY()), 
+                float(trans.getRotation().getZ()), 
+                float(trans.getRotation().getW()),
+                it->second.second["size"][0].get<float>(),
+                it->second.second["size"][1].get<float>(),
+                it->second.second["size"][2].get<float>()
+                );
+            // printf(
+            //     ",json:%s", 
+            //     it->second.second.dump().c_str()
+            //     );
+            printf("}");
+            it++;
+            if(it != bodyMapPair.end()) {
+              printf (",");
+            }
+          }
+
+        }
         printf("]\n");
         fflush(stdout);
+      }
 
     }
 
