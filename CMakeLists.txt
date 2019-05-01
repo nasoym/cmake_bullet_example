@@ -25,5 +25,12 @@ target_link_libraries(
     /Users/sinangoo/sinan/public/bullet3/build_cmake/src/BulletInverseDynamics/libBulletInverseDynamics.a
     /Users/sinangoo/sinan/public/bullet3/build_cmake/src/BulletSoftBody/libBulletSoftBody.a
     /Users/sinangoo/sinan/public/bullet3/build_cmake/src/LinearMath/libLinearMath.a
+
+    /Users/sinangoo/sinan/public/bullet3/build_cmake/src/BulletDynamics/libBulletDynamics.a
+    /Users/sinangoo/sinan/public/bullet3/build_cmake/src/BulletCollision/libBulletCollision.a
+    /Users/sinangoo/sinan/public/bullet3/build_cmake/src/LinearMath/libLinearMath.a
+
+
+
     )
 
