@@ -36,6 +36,11 @@ elif [ "$1" = "run" ];then shift ##
   socat TCP-LISTEN:9999,reuseaddr,fork STDOUT | ./build_cmake/hello \
     | python3 src/python_pika_write.py
 
+elif [ "$1" = "run_docker" ];then shift ##
+  socat TCP-LISTEN:9999,reuseaddr,fork STDOUT \
+    | ./build/hello \
+    | rabbit_host="rabbit" python3 src/python_pika_write.py
+
 elif [ "$1" = "build" ];then shift ##
   rm -rf build_cmake
   mkdir -p build_cmake 
