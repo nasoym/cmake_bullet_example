@@ -67,9 +67,9 @@ elif [ "$1" = "joint" ];then shift ##
   id1="${RANDOM}1"
   id2="${RANDOM}2"
   echo -ne "\
-{\"command\":\"create\",\"id\":\"${id1}\",\"mass\":1,\"size\":[1,1,4],\"pos\":[0,0,24]}
-{\"command\":\"create\",\"id\":\"${id2}\",\"mass\":1,\"size\":[1,1,4],\"pos\":[0,0,20]}
-{\"command\":\"joint\",\"id\":\"${id}\",\"id1\":\"${id1}\",\"id2\":\"${id2}\",\"pos1\":[0,0,2],\"rot1\":[0,0,0,1],\"pos2\":[0,0,-2],\"rot2\":[0,0,0,1],\"limits\":[0.0,1.5,0.0,0.0,0.3,1.0],\"damping\":0.01}
+{\"command\":\"create\",\"id\":\"${id1}\",\"mass\":1,\"size\":[1,1,4],\"pos\":[0,0,16]}
+{\"command\":\"create\",\"id\":\"${id2}\",\"mass\":0,\"size\":[1,1,4],\"pos\":[0,0,14]}
+{\"command\":\"joint\",\"id\":\"${id}\",\"id1\":\"${id1}\",\"id2\":\"${id2}\",\"pos1\":[0,0,2],\"rot1\":[0,0,0,1],\"pos2\":[0,0,-2],\"rot2\":[0,0,0,1],\"limits\":[0.0,1.5,1.5,0.0,0.3,1.0],\"damping\":0.01}
 " \
  | socat - TCP:localhost:9999
 # {\"command\":\"joint\",\"id1\":\"${id1}\",\"id2\":\"${id2}\",\"pos1\":[0,0,1.5],\"pos2\":[0,0,-1.5],\"limitlower\":[0,1,0],\"limitupper\":[0,-1,0]}

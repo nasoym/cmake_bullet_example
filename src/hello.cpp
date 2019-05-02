@@ -204,15 +204,10 @@ int main(int argc, char** argv)
               if (body && body->getMotionState()) {
                 delete body->getMotionState();
               }
-              bodyMapPair.erase(it);
+              // bodyMapPair.erase(it);
               delete body;
-
-
             }
-
-
-
-
+            bodyMapPair.clear();
 
           }
 
