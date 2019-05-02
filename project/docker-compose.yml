@@ -10,6 +10,8 @@ services:
     tty: true
     command: /cmake_bullet/docker.sh
 
+
+
   rabbit:
     image: activiti/rabbitmq-stomp
     ports:

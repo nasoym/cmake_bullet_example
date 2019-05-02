@@ -11,3 +11,32 @@ if [[ "${trace:=0}" -eq 1 ]];then
   export trace
 fi
 
+self_dir="$(dirname $(realpath $0))"
+
+: ${ec2_host:="host"}
+if [[ "$#" -eq 0 ]];then
+  :
+
+elif [[ "$1" == "scp" ]];then shift
+  ec2 ssh ${ec2_host} 'rm -rf /home/ec2-user/cmake_bullet_example'
+  ec2 scp ${ec2_host} cmake_bullet_example ${self_dir} 
+
+elif [[ "$1" == "mount" ]];then shift
+  mv ${self_dir}/project ${self_dir}/project_backup
+  mkdir ${self_dir}/project
+  sshfs ec2-user@$(ec2 get-ip ${ec2_host}):/home/ec2-user/cmake_bullet_example/project ${self_dir}/project
+
+elif [[ "$1" == "launch" ]];then shift
+  ec2 ssh ${ec2_host} 'cd /home/ec2-user/cmake_bullet_example/project; docker-compose up -d'
+
+elif [[ "$1" == "ports" ]];then shift
+  ec2 port ${ec2_host} 9999
+  ec2 port ${ec2_host} 15674
+
+elif [[ "$1" == "html" ]];then shift
+  ~/sinan/git_repos/socat_cgi_bin/socat_cgi -c ${self_dir}/project/html/
+
+else
+  echo "unknown command:$@"
+fi
+
