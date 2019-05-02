@@ -1,1 +1,0 @@
-/usr/bin/c++     CMakeFiles/hello.dir/src/hello.cpp.o  -o hello /bullet3/cmake_build/src/BulletDynamics/libBulletDynamics.a /bullet3/cmake_build/src/BulletCollision/libBulletCollision.a /bullet3/cmake_build/src/LinearMath/libLinearMath.a 

@@ -1,3 +1,0 @@
-/cmake_bullet/build/CMakeFiles/rebuild_cache.dir
-/cmake_bullet/build/CMakeFiles/hello.dir
-/cmake_bullet/build/CMakeFiles/edit_cache.dir
