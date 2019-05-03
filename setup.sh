@@ -13,16 +13,17 @@ fi
 
 self_dir="$(dirname $(realpath $0))"
 
-: ${ec2_host:="host"}
+: ${ec2_host:="host_1"}
 if [[ "$#" -eq 0 ]];then
   :
 
-elif [[ "$1" == "all" ]];then shift
+elif [[ "$1" == "create_ec2" ]];then shift
   export security_group="bullet"
   export security_group_id="sg-04063f7cc9a334a64"
   export instance_type="t3.medium"
   ec2 create ${ec2_host}
-  sleep 10
+
+elif [[ "$1" == "setup_ec2" ]];then shift
   provision_ec2 docker ${ec2_host}
   ${0} scp
   ${0} mount
