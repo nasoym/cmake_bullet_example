@@ -161,6 +161,24 @@ int main(int argc, char** argv)
 
 
           }
+          else if (json_line["command"].get<string>().compare("body_impulse") == 0) {
+            map<string, pair<btRigidBody*,json>>::iterator it = bodyMapPair.find(json_line["id"].get<string>());
+            if(it != bodyMapPair.end()) {
+              btRigidBody* body = it->second.first;
+              body->applyCentralImpulse(
+                  btVector3(
+                    json_line["force"][0].get<float>(),
+                    json_line["force"][1].get<float>(),
+                    json_line["force"][2].get<float>()
+                    )
+                  );
+              body->activate();
+
+  // std::cerr << "old numIterations: " << dynamicsWorld->getSolverInfo().m_numIterations << std::endl;
+
+
+            }
+          }
           else if (json_line["command"].get<string>().compare("delete") == 0) {
             map<string, pair<btRigidBody*,json>>::iterator it = bodyMapPair.find(json_line["id"].get<string>());
             if(it != bodyMapPair.end()) {
@@ -249,7 +267,10 @@ int main(int argc, char** argv)
                     json_line["limits"][5].get<float>()
                     );
 
-                // setLimit (btScalar _swingSpan1, btScalar _swingSpan2, btScalar _twistSpan, 
+                // setLimit (
+                  // btScalar _swingSpan1, 
+                  // btScalar _swingSpan2, 
+                  // btScalar _twistSpan, 
                   // btScalar _softness=1.f, 
                   // btScalar _biasFactor=0.3f, 
                   // btScalar _relaxationFactor=1.0f)
@@ -283,6 +304,35 @@ int main(int argc, char** argv)
 
 
           }
+
+          else if (json_line["command"].get<string>().compare("joint_limit") == 0) {
+
+            map<string, pair<btConeTwistConstraint*,json>>::iterator it = constraintMapPair.find(json_line["id"].get<string>());
+            if(it != constraintMapPair.end()) {
+              btConeTwistConstraint* constraint = it->second.first;
+
+              if (json_line.find("limits") != json_line.end()) {
+                constraint->setLimit(
+                  json_line["limits"][0].get<float>(),
+                  json_line["limits"][1].get<float>(),
+                  json_line["limits"][2].get<float>(),
+                  json_line["limits"][3].get<float>(),
+                  json_line["limits"][4].get<float>(),
+                  json_line["limits"][5].get<float>()
+                  );
+              }
+
+
+
+              constraint->getRigidBodyA().activate();
+              constraint->getRigidBodyB().activate();
+              
+
+            } 
+
+          }
+
+
           else if (json_line["command"].get<string>().compare("joint_motor") == 0) {
 
             // map<string, json>::iterator it = motorJson.find(json_line["id"].get<string>());
@@ -308,6 +358,10 @@ int main(int argc, char** argv)
                       json_line["target"][3].get<float>()
                     )
                   );
+
+              constraint->getRigidBodyA().activate();
+              constraint->getRigidBodyB().activate();
+              
 
             } 
 

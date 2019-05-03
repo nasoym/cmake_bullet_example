@@ -5,6 +5,8 @@ https://stackoverflow.com/questions/12778229/what-does-step-mean-in-stepsimulati
 
 ## todos
 
+  * apply force
+
   * joint settings
   * motor settings
   * simulation step time
