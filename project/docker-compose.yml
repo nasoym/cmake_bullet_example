@@ -8,15 +8,22 @@ services:
     ports:
       - 9999:9999
     tty: true
+    depends_on:
+      - rabbit
     command: /cmake_bullet/docker.sh
 
-
+  html:
+    image: httpd
+    ports:
+     - 8080:80 
+    volumes:
+      - ./html/:/usr/local/apache2/htdocs/ 
 
   rabbit:
     image: activiti/rabbitmq-stomp
     ports:
-      - 5672:5672 
       - 15672:15672
       - 15674:15674 
+      - 5672:5672 
 
 

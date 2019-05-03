@@ -11,7 +11,7 @@ if [[ "${trace:=0}" -eq 1 ]];then
   export trace
 fi
 
-apt-get install -y socat
+# apt-get install -y socat
 
 rm -rf /cmake_bullet/build || true
 mkdir -p /cmake_bullet/build 

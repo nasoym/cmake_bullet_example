@@ -43,7 +43,7 @@ elif [[ "$1" == "launch" ]];then shift
 
 elif [[ "$1" == "ports" ]];then shift
   ec2 port ${ec2_host} 9999
-  ec2 port ${ec2_host} 15674
+  # ec2 port ${ec2_host} 15674
 
 elif [[ "$1" == "html" ]];then shift
   ~/sinan/git_repos/socat_cgi_bin/socat_cgi -c ${self_dir}/project/html/

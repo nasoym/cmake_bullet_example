@@ -78,7 +78,8 @@ int main(int argc, char** argv)
   int poll_return;
 
   // int sleep_time = 2000;
-  int sleep_time = 16;
+  int sleep_time = 100;
+  // int sleep_time = 16;
 
   deque<string> line_deque;
 

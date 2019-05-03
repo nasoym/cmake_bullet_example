@@ -65,7 +65,7 @@ elif [ "$1" = "single" ];then shift ##
 elif [ "$1" = "impulse" ];then shift ##
   id="$1"; shift
   echo -ne "\
-{\"command\":\"body_impulse\",\"id\":\"${id}\",\"force\":[10,10,10]}
+{\"command\":\"body_impulse\",\"id\":\"${id}\",\"force\":[0,0,50]}
 " \
  | socat - TCP:localhost:9999
 
