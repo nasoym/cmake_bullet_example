@@ -20,7 +20,7 @@ if [[ "$#" -eq 0 ]];then
 elif [[ "$1" == "all" ]];then shift
   export security_group="bullet"
   export security_group_id="sg-04063f7cc9a334a64"
-  export instance_type="t2.medium"
+  export instance_type="t3.medium"
   ec2 create ${ec2_host}
   sleep 10
   provision_ec2 docker ${ec2_host}
@@ -43,7 +43,9 @@ elif [[ "$1" == "launch" ]];then shift
 
 elif [[ "$1" == "ports" ]];then shift
   ec2 port ${ec2_host} 9999
-  # ec2 port ${ec2_host} 15674
+  ec2 port ${ec2_host} 8080
+  ec2 port ${ec2_host} 15672
+  ec2 port ${ec2_host} 15674
 
 elif [[ "$1" == "html" ]];then shift
   ~/sinan/git_repos/socat_cgi_bin/socat_cgi -c ${self_dir}/project/html/
