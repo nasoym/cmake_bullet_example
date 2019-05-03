@@ -17,6 +17,18 @@ self_dir="$(dirname $(realpath $0))"
 if [[ "$#" -eq 0 ]];then
   :
 
+elif [[ "$1" == "all" ]];then shift
+  export security_group="bullet"
+  export security_group_id="sg-04063f7cc9a334a64"
+  export instance_type="t2.medium"
+  ec2 create ${ec2_host}
+  sleep 10
+  provision_ec2 docker ${ec2_host}
+  ${0} scp
+  ${0} mount
+  ${0} ports
+  ${0} launch
+
 elif [[ "$1" == "scp" ]];then shift
   ec2 ssh ${ec2_host} 'rm -rf /home/ec2-user/cmake_bullet_example'
   ec2 scp ${ec2_host} cmake_bullet_example ${self_dir} 
