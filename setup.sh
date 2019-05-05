@@ -32,7 +32,8 @@ elif [[ "$1" == "setup_ec2" ]];then shift
   ${0} launch
 
 elif [[ "$1" == "restore" ]];then shift
-  git reset --hard HEAD
+  ec2 delete ${ec2_host}
+  # git reset --hard HEAD
 
 elif [[ "$1" == "scp" ]];then shift
   ec2 ssh ${ec2_host} 'rm -rf /home/ec2-user/cmake_bullet_example'
