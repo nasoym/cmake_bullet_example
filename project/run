@@ -97,10 +97,10 @@ elif [ "$1" = "joint" ];then shift ##
 
 echo "$id $id1 $id2"
 
-elif [ "$1" = "joint_limit" ];then shift ##
+elif [ "$1" = "joint_settings" ];then shift ##
   id="$1"; shift
   echo -ne "\
-{\"command\":\"joint_limit\",\"id\":\"${id}\",\"limits\":[0.0,0.5,1.5,1.0,0.3,1.0]}
+{\"command\":\"joint_limit\",\"id\":\"${id}\",\"limits\":[0.0,0.5,1.5,1.0,0.3,1.0],\"damping\":0.01}
 " \
  | socat - TCP:localhost:9999
 

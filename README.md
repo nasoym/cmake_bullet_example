@@ -12,8 +12,6 @@ https://stackoverflow.com/questions/12778229/what-does-step-mean-in-stepsimulati
 
   * simulation settings
 
-  * delete joints when deleting bodies
-
   * delete collision shape
 
   * create plane/sphere

@@ -93,13 +93,26 @@ int main(int argc, char** argv)
 
   // int sleep_time = 2000;
   // int sleep_time = 100;
-  int sleep_time = 16;
+  // int sleep_time = 1000;
+  int sleep_time = 40;
+  // int sleep_time = 16;
 
   deque<string> line_deque;
 
   json json_line;
+  auto start = std::chrono::high_resolution_clock::now();
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  auto elapsed = std::chrono::high_resolution_clock::now() - start;
+  long long microseconds = std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
+  float elapsed_seconds = microseconds / (1000.0f * 1000.0f);
+  std::cerr << "elapsed: " <<  microseconds << std::endl;
+  std::cerr << "elapsed: " <<  elapsed_seconds << std::endl;
+
+// 1000155
+  auto sim_time = std::chrono::high_resolution_clock::now();
 
   while(1) {
+
     poll_return = poll(&fds, 1, 0);
     if(poll_return == 1) {
       // bytes_read = read(&fds, message, nbytes);
@@ -239,9 +252,6 @@ int main(int argc, char** argv)
             } else {
 
 
-
-
-
               map<string, pair<btRigidBody*,json>>::iterator it1 = bodyMapPair.find(json_line["id1"].get<string>());
               map<string, pair<btRigidBody*,json>>::iterator it2 = bodyMapPair.find(json_line["id2"].get<string>());
               if ( (it1 != bodyMapPair.end())  && (it2 != bodyMapPair.end())  ) {
@@ -346,7 +356,7 @@ int main(int argc, char** argv)
           }
 
 
-          else if (json_line["command"].get<string>().compare("joint_limit") == 0) {
+          else if (json_line["command"].get<string>().compare("joint_settings") == 0) {
 
             map<string, pair<btConeTwistConstraint*,json>>::iterator it = constraintMapPair.find(json_line["id"].get<string>());
             if(it != constraintMapPair.end()) {
@@ -362,8 +372,9 @@ int main(int argc, char** argv)
                   json_line["limits"][5].get<float>()
                   );
               }
-
-
+              if (json_line.find("damping") != json_line.end()) {
+                constraint->setDamping(json_line["damping"].get<float>());
+              }
 
               constraint->getRigidBodyA().activate();
               constraint->getRigidBodyB().activate();
@@ -454,40 +465,46 @@ int main(int argc, char** argv)
     {
 
 
-      map<string, json>::iterator it = motorJson.begin();
+      // map<string, json>::iterator it = motorJson.begin();
 
-      while(it != motorJson.end())
-      {
-        json json_line = it->second;
-        string bodyId = json_line["id"].get<string>();
-        map<string, pair<btConeTwistConstraint*,json>>::iterator constraintIt = constraintMapPair.find(bodyId);
-        if(constraintIt != constraintMapPair.end()) {
-          btConeTwistConstraint* constraint = constraintIt->second.first;
+      // while(it != motorJson.end())
+      // {
+      //   json json_line = it->second;
+      //   string bodyId = json_line["id"].get<string>();
+      //   map<string, pair<btConeTwistConstraint*,json>>::iterator constraintIt = constraintMapPair.find(bodyId);
+      //   if(constraintIt != constraintMapPair.end()) {
+      //     btConeTwistConstraint* constraint = constraintIt->second.first;
+      //
+      //     // std::cerr << "apply motor to body id:" << bodyId << std::endl;
+      //     constraint->enableMotor(true);
+      //     // constraint->enableMotor(json_line["enable"].get<bool>());
+      //     constraint->setMaxMotorImpulseNormalized(1.0); 
+      //     // constraint->setMaxMotorImpulseNormalized(json_line["impulse"].get<float>());
+      //     // constraint->setMaxMotorImpulse(json_line["impulse"].get<float>());
+      //     // constraint->setMaxMotorImpulseNormalized(json_line["impulse"].get<float>());
+      //     constraint->setMotorTargetInConstraintSpace(
+      //           btQuaternion(0,0,0,1)
+      //           //btQuaternion(0.5,0.5,0.5,0.5)
+      //           // btQuaternion(
+      //           //   json_line["target"][0].get<float>(),
+      //           //   json_line["target"][1].get<float>(),
+      //           //   json_line["target"][2].get<float>(),
+      //           //   json_line["target"][3].get<float>()
+      //           // )
+      //         );
+      //
+      //   }
+      //
+      // }
 
-          // std::cerr << "apply motor to body id:" << bodyId << std::endl;
-          constraint->enableMotor(true);
-          // constraint->enableMotor(json_line["enable"].get<bool>());
-          constraint->setMaxMotorImpulseNormalized(1.0); 
-          // constraint->setMaxMotorImpulseNormalized(json_line["impulse"].get<float>());
-          // constraint->setMaxMotorImpulse(json_line["impulse"].get<float>());
-          // constraint->setMaxMotorImpulseNormalized(json_line["impulse"].get<float>());
-          constraint->setMotorTargetInConstraintSpace(
-                btQuaternion(0,0,0,1)
-                //btQuaternion(0.5,0.5,0.5,0.5)
-                // btQuaternion(
-                //   json_line["target"][0].get<float>(),
-                //   json_line["target"][1].get<float>(),
-                //   json_line["target"][2].get<float>(),
-                //   json_line["target"][3].get<float>()
-                // )
-              );
 
-        }
-
-      }
-
-
-      dynamicsWorld->stepSimulation(1.f / 60.f, 10, 1.f / 240.f);
+      auto elapsed_sim_time = std::chrono::high_resolution_clock::now() - sim_time;
+      long long elapsed_sim_micro = std::chrono::duration_cast<std::chrono::microseconds>(elapsed_sim_time).count();
+      float elapsed_sim_seconds = elapsed_sim_micro / (1000.0f * 1000.0f);
+      // std::cerr << "elapsed: " <<  elapsed_sim_seconds << std::endl;
+      sim_time = std::chrono::high_resolution_clock::now();
+      // dynamicsWorld->stepSimulation(1.f / 60.f, 10, 1.f / 240.f);
+      dynamicsWorld->stepSimulation(elapsed_sim_seconds, 10, 1.f / 240.f);
 
       // //print positions of all objects
       // for (int j = dynamicsWorld->getNumCollisionObjects() - 1; j >= 0; j--)
