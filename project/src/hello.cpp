@@ -24,6 +24,24 @@ using namespace std;
 using json = nlohmann::json;
 const double PI = 3.1415926535897932384626433832795028841972;
 
+  map <string,pair<btRigidBody*,json>> bodyMapPair;
+
+  map <string,pair<btConeTwistConstraint*,json>> constraintMapPair;
+  map <string,json> motorJson;
+
+void clearJointForBody(string bodyId) {
+  map<string, pair<btConeTwistConstraint*,json>>::iterator it = constraintMapPair.begin();
+  for(it = constraintMapPair.begin();it != constraintMapPair.end();++it) 
+  {
+    json constraint_json_line = it->second.second;
+    if (constraint_json_line["id1"].get<string>().compare(bodyId) == 0) {
+        constraintMapPair.erase(it);
+    } else if (constraint_json_line["id2"].get<string>().compare(bodyId) == 0) {
+        constraintMapPair.erase(it);
+    }
+  }
+
+}
 
 int main(int argc, char** argv)
 {
@@ -60,10 +78,6 @@ int main(int argc, char** argv)
 	btAlignedObjectArray<btCollisionShape*> collisionShapes;
 
 	///create a few basic rigid bodies
-  map <string,pair<btRigidBody*,json>> bodyMapPair;
-
-  map <string,pair<btConeTwistConstraint*,json>> constraintMapPair;
-  map <string,json> motorJson;
 
 
   char newline = '\n';
@@ -78,8 +92,8 @@ int main(int argc, char** argv)
   int poll_return;
 
   // int sleep_time = 2000;
-  int sleep_time = 100;
-  // int sleep_time = 16;
+  // int sleep_time = 100;
+  int sleep_time = 16;
 
   deque<string> line_deque;
 
@@ -184,6 +198,9 @@ int main(int argc, char** argv)
             map<string, pair<btRigidBody*,json>>::iterator it = bodyMapPair.find(json_line["id"].get<string>());
             if(it != bodyMapPair.end()) {
               btRigidBody* body = it->second.first;
+
+              clearJointForBody(it->first);
+
               dynamicsWorld->removeRigidBody(body);
 
               if (body && body->getMotionState()) {
@@ -201,15 +218,15 @@ int main(int argc, char** argv)
             while(it != bodyMapPair.end())
             {
               btRigidBody* body = it->second.first;
+              clearJointForBody(it->first);
               dynamicsWorld->removeRigidBody(body);
 
               if (body && body->getMotionState()) {
                 delete body->getMotionState();
               }
-              // bodyMapPair.erase(it);
               delete body;
+              it = bodyMapPair.erase(it);
             }
-            bodyMapPair.clear();
 
           }
 
@@ -305,6 +322,29 @@ int main(int argc, char** argv)
 
 
           }
+
+          else if (json_line["command"].get<string>().compare("joint_find_body") == 0) {
+            map<string, pair<btConeTwistConstraint*,json>>::iterator it = constraintMapPair.begin();
+            for(it = constraintMapPair.begin();it != constraintMapPair.end();++it) 
+            {
+              json constraint_json_line = it->second.second;
+              if (json_line["id"].get<string>().compare(constraint_json_line["id1"].get<string>()) == 0) {
+                std::cerr << "found constraint for body:" <<  it->first << std::endl;
+              } else if (json_line["id"].get<string>().compare(constraint_json_line["id2"].get<string>()) == 0) {
+                std::cerr << "found constraint for body:" <<  it->first << std::endl;
+              }
+            }
+          }
+
+          else if (json_line["command"].get<string>().compare("list_joints") == 0) {
+            map<string, pair<btConeTwistConstraint*,json>>::iterator it = constraintMapPair.begin();
+            for(it = constraintMapPair.begin();it != constraintMapPair.end();++it) 
+            {
+              json constraint_json_line = it->second.second;
+              std::cerr << "joint:" <<  it->first << " body1:" << constraint_json_line["id1"].get<string>() << " body2:" << constraint_json_line["id1"].get<string>() << std::endl;
+            }
+          }
+
 
           else if (json_line["command"].get<string>().compare("joint_limit") == 0) {
 

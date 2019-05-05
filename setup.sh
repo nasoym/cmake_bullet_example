@@ -13,13 +13,14 @@ fi
 
 self_dir="$(dirname $(realpath $0))"
 
-: ${ec2_host:="host_1"}
+: ${ec2_host:="bullet_host"}
 if [[ "$#" -eq 0 ]];then
   :
 
 elif [[ "$1" == "create_ec2" ]];then shift
   export security_group="bullet"
   export security_group_id="sg-04063f7cc9a334a64"
+  #t3.medium  2(vcpu)     4(gb ram)     0.048($ per hour)
   export instance_type="t3.medium"
   ec2 create ${ec2_host}
 
@@ -30,6 +31,9 @@ elif [[ "$1" == "setup_ec2" ]];then shift
   ${0} ports
   ${0} launch
 
+elif [[ "$1" == "restore" ]];then shift
+  git reset --hard HEAD
+
 elif [[ "$1" == "scp" ]];then shift
   ec2 ssh ${ec2_host} 'rm -rf /home/ec2-user/cmake_bullet_example'
   ec2 scp ${ec2_host} cmake_bullet_example ${self_dir} 
@@ -38,6 +42,7 @@ elif [[ "$1" == "mount" ]];then shift
   mv ${self_dir}/project ${self_dir}/project_backup
   mkdir ${self_dir}/project
   sshfs ec2-user@$(ec2 get-ip ${ec2_host}):/home/ec2-user/cmake_bullet_example/project ${self_dir}/project
+  # -o ssh_command='ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no '
 
 elif [[ "$1" == "launch" ]];then shift
   ec2 ssh ${ec2_host} 'cd /home/ec2-user/cmake_bullet_example/project; docker-compose up -d'

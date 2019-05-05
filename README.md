@@ -5,7 +5,6 @@ https://stackoverflow.com/questions/12778229/what-does-step-mean-in-stepsimulati
 
 ## todos
 
-  * apply force
 
   * joint settings
   * motor settings
@@ -13,7 +12,6 @@ https://stackoverflow.com/questions/12778229/what-does-step-mean-in-stepsimulati
 
   * simulation settings
 
-  * clear all bodies
   * delete joints when deleting bodies
 
   * delete collision shape
