@@ -4,12 +4,8 @@
 https://stackoverflow.com/questions/12778229/what-does-step-mean-in-stepsimulation-and-what-do-its-parameters-mean-in-bulle
 
 ## todos
-
-  * joint settings
-  * motor settings
-
-  * simulation settings
-
+  * joint/motor/simulation settings for stable motor force
+  * -----
   * delete collision shape
   * create plane/sphere
 
