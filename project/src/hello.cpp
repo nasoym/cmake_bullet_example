@@ -68,7 +68,7 @@ int main(int argc, char** argv)
 	dynamicsWorld->setGravity(btVector3(0, 0, -10));
 	// dynamicsWorld->getSolverInfo().m_globalCfm = btScalar(1e-4);  //todo: what value is good?
   // std::cerr << "old numIterations: " << dynamicsWorld->getSolverInfo().m_numIterations << std::endl;
-	// dynamicsWorld->getSolverInfo().m_numIterations = 50;  //todo: what value is good?
+	dynamicsWorld->getSolverInfo().m_numIterations = 50;  //todo: what value is good?
 
 
 	///-----initialization_end-----
@@ -504,7 +504,9 @@ int main(int argc, char** argv)
       // std::cerr << "elapsed: " <<  elapsed_sim_seconds << std::endl;
       sim_time = std::chrono::high_resolution_clock::now();
       // dynamicsWorld->stepSimulation(1.f / 60.f, 10, 1.f / 240.f);
-      dynamicsWorld->stepSimulation(elapsed_sim_seconds, 10, 1.f / 240.f);
+      // dynamicsWorld->stepSimulation(elapsed_sim_seconds, 10, 1.f / 240.f);
+      dynamicsWorld->stepSimulation(elapsed_sim_seconds, 20, 1.f / 240.f);
+      // dynamicsWorld->stepSimulation(elapsed_sim_seconds, 10, 1.f / 60.f);
 
       // //print positions of all objects
       // for (int j = dynamicsWorld->getNumCollisionObjects() - 1; j >= 0; j--)

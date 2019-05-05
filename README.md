@@ -5,20 +5,32 @@ https://stackoverflow.com/questions/12778229/what-does-step-mean-in-stepsimulati
 
 ## todos
 
-
   * joint settings
   * motor settings
-  * simulation step time
 
   * simulation settings
 
   * delete collision shape
-
   * create plane/sphere
 
 https://stackoverflow.com/questions/45691950/how-to-achieve-maximum-simulation-accuracy-in-bullet
 gDynamicsWorld->stepSimulation(SIMULATION_STEP_TIME, 1, 1.0f/60.0f);
 Also increasing solver iterations count helps a bit:
+
+btDynamicsWorld::stepSimulation(
+   btScalar timeStep,
+      int maxSubSteps=1,
+         btScalar fixedTimeStep=btScalar(1.)/btScalar(60.));
+         timeStep - time passed after last simulation.
+
+         Internally simulation is done for some internal constant steps. fixedTimeStep
+
+         fixedTimeStep ~~~ 0.01666666 = 1/60
+
+         if timeStep is 0.1 then it will include 6 (timeStep / fixedTimeStep) internal simulations.
+
+         To make glider movements BulletPhysics interpolate final step results according reminder after division (timeStep / fixedTimeStep)
+
 
 btContactSolverInfo& info = dynamicsWorld->getSolverInfo();
 info.m_numIterations = 50;
