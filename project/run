@@ -132,11 +132,23 @@ elif [ "$1" = "joint_settings_1" ];then shift ##
 {\"command\":\"joint_settings\",\"id\":\"${id}\",\"settings\":[{\"index\":4,\"limits\":[-1,1],\"bounce\":1,\"spring\":true,\"stiffness\":100,\"damping\":0}]}
 " \
  | socat - TCP:localhost:9999
+elif [ "$1" = "joint_settings_1b" ];then shift ##
+  id="$1"; shift
+  echo -ne "\
+{\"command\":\"joint_settings\",\"id\":\"${id}\",\"settings\":[{\"index\":3,\"limits\":[-2,2],\"bounce\":1,\"spring\":true,\"stiffness\":100,\"damping\":0}]}
+" \
+ | socat - TCP:localhost:9999
 
 elif [ "$1" = "joint_settings_2" ];then shift ##
   id="$1"; shift
   echo -ne "\
 {\"command\":\"joint_settings\",\"id\":\"${id}\",\"settings\":[{\"index\":4,\"motor\":true,\"targetvelocity\":3.0,\"maxmotorforce\":600,\"servo\":true,\"servotarget\":-0.9}]}
+" \
+ | socat - TCP:localhost:9999
+elif [ "$1" = "joint_settings_2b" ];then shift ##
+  id="$1"; shift
+  echo -ne "\
+{\"command\":\"joint_settings\",\"id\":\"${id}\",\"settings\":[{\"index\":3,\"motor\":true,\"targetvelocity\":3.0,\"maxmotorforce\":600,\"servo\":true,\"servotarget\":-0.5}]}
 " \
  | socat - TCP:localhost:9999
 
