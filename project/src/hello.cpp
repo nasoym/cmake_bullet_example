@@ -342,6 +342,8 @@ int main(int argc, char** argv)
 
 
 
+
+
                 dynamicsWorld->addConstraint(constraint, true);
 
 
@@ -384,6 +386,71 @@ int main(int argc, char** argv)
             map<string, pair<btGeneric6DofSpring2Constraint*,json>>::iterator it = constraintMapPair.find(json_line["id"].get<string>());
             if(it != constraintMapPair.end()) {
               btGeneric6DofSpring2Constraint* constraint = it->second.first;
+
+              if (json_line["settings"].is_array()) {
+                json setting;
+                int index;
+                for(int i=0;i < json_line["settings"].size(); i++) {
+                  setting = json_line["settings"][i];
+                  index = setting["index"].get<int>();
+                  if (setting.find("damping") != setting.end()) {
+                    constraint->setDamping(index, json_line["damping"].get<float>());
+                  }
+                  if (setting.find("stiffness") != setting.end()) {
+                    constraint->setStiffness(index, json_line["stiffness"].get<float>());
+                  }
+                  if (setting.find("spring") != setting.end()) {
+                    constraint->enableSpring(index, json_line["spring"].get<bool>());
+                  }
+                  if (setting.find("bounce") != setting.end()) {
+                    constraint->setBounce(index, json_line["bounce"].get<float>());
+                  }
+                  if (setting.find("equilibrium") != setting.end()) {
+                    constraint->setEquilibriumPoint(index, json_line["equilibrium"].get<float>());
+                  }
+                  if (setting.find("targetvelocity") != setting.end()) {
+                    constraint->setTargetVelocity(index, json_line["targetvelocity"].get<float>());
+                  }
+                  if (setting.find("maxmotorforce") != setting.end()) {
+                    constraint->setMaxMotorForce(index, json_line["maxmotorforce"].get<float>());
+                  }
+                  if (setting.find("maxmotorforce") != setting.end()) {
+                    constraint->setMaxMotorForce(index, json_line["maxmotorforce"].get<float>());
+                  }
+                  if (setting.find("servotarget") != setting.end()) {
+                    constraint->setServoTarget(index, json_line["servotarget"].get<float>());
+                  }
+                  if (setting.find("motor") != setting.end()) {
+                    constraint->enableMotor(index, json_line["motor"].get<bool>());
+                  }
+                  if (setting.find("servo") != setting.end()) {
+                    constraint->setServo(index, json_line["servo"].get<bool>());
+                  }
+                  if (setting.find("limits") != setting.end()) {
+                    constraint->setLimit(index, json_line["limits"][0].get<float>(), json_line["limits"][1].get<float>());
+                  }
+
+
+                }
+
+
+              }
+/*
+index:0,
+lowerlimit:
+upperlimit:
+bounce
+spring
+stiffness
+damping
+equilibrium
+motor
+targetvelocity
+maxmotorforce
+servo
+servotarget
+*/
+
 
               std::cerr << "set joint settings:" <<  json_line["id"].get<string>() << std::endl;
               // if (json_line.find("limits") != json_line.end()) {
