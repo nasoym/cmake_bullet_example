@@ -65,7 +65,7 @@ elif [ "$1" = "single" ];then shift ##
 elif [ "$1" = "impulse" ];then shift ##
   id="$1"; shift
   echo -ne "\
-{\"command\":\"body_impulse\",\"id\":\"${id}\",\"force\":[10,10,10]}
+{\"command\":\"body_impulse\",\"id\":\"${id}\",\"force\":[1,1,0]}
 " \
  | socat - TCP:localhost:9999
 
@@ -87,8 +87,8 @@ elif [ "$1" = "joint" ];then shift ##
   id1="${RANDOM}1"
   id2="${RANDOM}2"
   echo -ne "\
-{\"command\":\"create\",\"id\":\"${id1}\",\"mass\":0,\"size\":[1.5,2.5,4],\"pos\":[10,10,16]}
-{\"command\":\"create\",\"id\":\"${id2}\",\"mass\":1,\"size\":[1,2,4],\"pos\":[10,10,14]}
+{\"command\":\"create\",\"id\":\"${id1}\",\"mass\":0,\"size\":[1.5,2.5,4],\"pos\":[0,0,16]}
+{\"command\":\"create\",\"id\":\"${id2}\",\"mass\":1,\"size\":[1,2,4],\"pos\":[0,0,14]}
 {\"command\":\"joint\",\"id\":\"${id}\",\"id1\":\"${id1}\",\"id2\":\"${id2}\",\"pos1\":[0,0,2],\"rot1\":[0,0,0,1],\"pos2\":[0,0,-2],\"rot2\":[0,0,0,1],\"limits\":[0.0,1.5,1.5, 1.0,0.3,1.0],\"damping\":0.01}
 " \
  | socat - TCP:localhost:9999
@@ -108,9 +108,10 @@ echo "$id $id1 $id2"
 elif [ "$1" = "joint_settings" ];then shift ##
   id="$1"; shift
   echo -ne "\
-{\"command\":\"joint_limit\",\"id\":\"${id}\",\"limits\":[0.0,0.5,0.5,1.0,0.3,1.0],\"damping\":0.01}
+{\"command\":\"joint_settings\",\"id\":\"${id}\",\"angular_low\":[0.0,0.0,0.0],\"angular_high\":[0.0,0.0,0.0]}
 " \
  | socat - TCP:localhost:9999
+# {\"command\":\"joint_limit\",\"id\":\"${id}\",\"limits\":[0.0,0.5,0.5,1.0,0.3,1.0],\"damping\":0.01}
 
 elif [ "$1" = "joint_motor_off" ];then shift ##
   id="$1"; shift

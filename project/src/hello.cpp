@@ -23,14 +23,15 @@
 using namespace std;
 using json = nlohmann::json;
 const double PI = 3.1415926535897932384626433832795028841972;
+#define M_PI_2 1.57079632679489661923
 
   map <string,pair<btRigidBody*,json>> bodyMapPair;
 
-  map <string,pair<btConeTwistConstraint*,json>> constraintMapPair;
+  map <string,pair<btGeneric6DofSpring2Constraint*,json>> constraintMapPair;
   map <string,json> motorJson;
 
 void clearJointForBody(string bodyId) {
-  map<string, pair<btConeTwistConstraint*,json>>::iterator it = constraintMapPair.begin();
+  map<string, pair<btGeneric6DofSpring2Constraint*,json>>::iterator it = constraintMapPair.begin();
   for(it = constraintMapPair.begin();it != constraintMapPair.end();++it) 
   {
     json constraint_json_line = it->second.second;
@@ -68,7 +69,8 @@ int main(int argc, char** argv)
 	dynamicsWorld->setGravity(btVector3(0, 0, -10));
 	// dynamicsWorld->getSolverInfo().m_globalCfm = btScalar(1e-4);  //todo: what value is good?
   // std::cerr << "old numIterations: " << dynamicsWorld->getSolverInfo().m_numIterations << std::endl;
-	dynamicsWorld->getSolverInfo().m_numIterations = 50;  //todo: what value is good?
+	// dynamicsWorld->getSolverInfo().m_numIterations = 50;  //todo: what value is good?
+	dynamicsWorld->getSolverInfo().m_numIterations = 100;
 
 
 	///-----initialization_end-----
@@ -246,7 +248,7 @@ int main(int argc, char** argv)
           else if (json_line["command"].get<string>().compare("joint") == 0) {
 
 
-            map<string, pair<btConeTwistConstraint*,json>>::iterator it = constraintMapPair.find(json_line["id"].get<string>());
+            map<string, pair<btGeneric6DofSpring2Constraint*,json>>::iterator it = constraintMapPair.find(json_line["id"].get<string>());
             if(it != constraintMapPair.end()) {
               // std::cout << "id: " << json_line["id"].get<string>() << " was already created" << std::endl;
             } else {
@@ -283,46 +285,67 @@ int main(int argc, char** argv)
                       json_line["pos2"][2].get<float>()
                       )
                     );  
-                btConeTwistConstraint* fixed = new btConeTwistConstraint(*body1, *body2, pivotInA, pivotInB);
+                btGeneric6DofSpring2Constraint* constraint = new btGeneric6DofSpring2Constraint(*body1, *body2, pivotInA, pivotInB);
 
-                if (json_line.find("limits") != json_line.end()) {
-                  fixed->setLimit(
-                    json_line["limits"][0].get<float>(),
-                    json_line["limits"][1].get<float>(),
-                    json_line["limits"][2].get<float>(),
-                    json_line["limits"][3].get<float>(),
-                    json_line["limits"][4].get<float>(),
-                    json_line["limits"][5].get<float>()
-                    );
 
-                // setLimit (
-                  // btScalar _swingSpan1, 
-                  // btScalar _swingSpan2, 
-                  // btScalar _twistSpan, 
-                  // btScalar _softness=1.f, 
-                  // btScalar _biasFactor=0.3f, 
-                  // btScalar _relaxationFactor=1.0f)
-                  // setDamping (btScalar damping)
 
-                }
-                if (json_line.find("damping") != json_line.end()) {
-                  fixed->setDamping(json_line["damping"].get<float>());
-                }
+                // if (json_line.find("limits") != json_line.end()) {
+                //   constraint->setLimit(
+                //     json_line["limits"][0].get<float>(),
+                //     json_line["limits"][1].get<float>(),
+                //     json_line["limits"][2].get<float>(),
+                //     json_line["limits"][3].get<float>(),
+                //     json_line["limits"][4].get<float>(),
+                //     json_line["limits"][5].get<float>()
+                //     );
+                //
+                // // setLimit (
+                //   // btScalar _swingSpan1, 
+                //   // btScalar _swingSpan2, 
+                //   // btScalar _twistSpan, 
+                //   // btScalar _softness=1.f, 
+                //   // btScalar _biasFactor=0.3f, 
+                //   // btScalar _relaxationFactor=1.0f)
+                //   // setDamping (btScalar damping)
+                //
+                // }
+                // if (json_line.find("damping") != json_line.end()) {
+                //   constraint->setDamping(json_line["damping"].get<float>());
+                // }
                 //damping: 0.01
-                // std::cerr << "damping: " << fixed->getDamping() << std::endl;
+                // std::cerr << "damping: " << constraint->getDamping() << std::endl;
 
 
-                // fixed->enableMotor(true);
-                // fixed->setMaxMotorImpulseNormalized(0.1); 
-                // // fixed->setMaxMotorImpulse(json_line["impulse"].get<float>());
-                // fixed->setMotorTargetInConstraintSpace( btQuaternion(0.5,0.5,0.5,0.5));
+                // constraint->enableMotor(true);
+                // constraint->setMaxMotorImpulseNormalized(0.1); 
+                // // constraint->setMaxMotorImpulse(json_line["impulse"].get<float>());
+                // constraint->setMotorTargetInConstraintSpace( btQuaternion(0.5,0.5,0.5,0.5));
+
+                constraint->setLimit(0, 0, 0);
+                constraint->setLimit(1, 0, 0);
+                constraint->setLimit(2, 0, 0);
+                constraint->setLimit(3, 0, 0);
+                constraint->setLimit(4, -1, 1);
+                constraint->setLimit(5, 0, 0);
+
+                constraint->setBounce(4, 1);
+                constraint->enableSpring(4, true);
+                constraint->setStiffness(4, 100);
+                constraint->setDamping(4, 0);
+                // setEquilibriumPoint (int index, btScalar val)
+
+                constraint->enableMotor(4, true);
+                constraint->setTargetVelocity(4, 3.f);
+                constraint->setMaxMotorForce(4, 600.f);
+                constraint->setServo(4, true);
+                constraint->setServoTarget(4, 0.9);
 
 
 
-                dynamicsWorld->addConstraint(fixed, true);
+                dynamicsWorld->addConstraint(constraint, true);
 
 
-                constraintMapPair.insert(make_pair(json_line["id"].get<string>(),make_pair(fixed,json_line)));
+                constraintMapPair.insert(make_pair(json_line["id"].get<string>(),make_pair(constraint,json_line)));
 
               }
 
@@ -334,7 +357,7 @@ int main(int argc, char** argv)
           }
 
           else if (json_line["command"].get<string>().compare("joint_find_body") == 0) {
-            map<string, pair<btConeTwistConstraint*,json>>::iterator it = constraintMapPair.begin();
+            map<string, pair<btGeneric6DofSpring2Constraint*,json>>::iterator it = constraintMapPair.begin();
             for(it = constraintMapPair.begin();it != constraintMapPair.end();++it) 
             {
               json constraint_json_line = it->second.second;
@@ -347,7 +370,7 @@ int main(int argc, char** argv)
           }
 
           else if (json_line["command"].get<string>().compare("list_joints") == 0) {
-            map<string, pair<btConeTwistConstraint*,json>>::iterator it = constraintMapPair.begin();
+            map<string, pair<btGeneric6DofSpring2Constraint*,json>>::iterator it = constraintMapPair.begin();
             for(it = constraintMapPair.begin();it != constraintMapPair.end();++it) 
             {
               json constraint_json_line = it->second.second;
@@ -358,24 +381,58 @@ int main(int argc, char** argv)
 
           else if (json_line["command"].get<string>().compare("joint_settings") == 0) {
 
-            map<string, pair<btConeTwistConstraint*,json>>::iterator it = constraintMapPair.find(json_line["id"].get<string>());
+            map<string, pair<btGeneric6DofSpring2Constraint*,json>>::iterator it = constraintMapPair.find(json_line["id"].get<string>());
             if(it != constraintMapPair.end()) {
-              btConeTwistConstraint* constraint = it->second.first;
+              btGeneric6DofSpring2Constraint* constraint = it->second.first;
 
-              if (json_line.find("limits") != json_line.end()) {
-                constraint->setLimit(
-                  json_line["limits"][0].get<float>(),
-                  json_line["limits"][1].get<float>(),
-                  json_line["limits"][2].get<float>(),
-                  json_line["limits"][3].get<float>(),
-                  json_line["limits"][4].get<float>(),
-                  json_line["limits"][5].get<float>()
+              std::cerr << "set joint settings:" <<  json_line["id"].get<string>() << std::endl;
+              // if (json_line.find("limits") != json_line.end()) {
+              //   constraint->setLimit(
+              //     json_line["limits"][0].get<float>(),
+              //     json_line["limits"][1].get<float>(),
+              //     json_line["limits"][2].get<float>(),
+              //     json_line["limits"][3].get<float>(),
+              //     json_line["limits"][4].get<float>(),
+              //     json_line["limits"][5].get<float>()
+              //     );
+              // }
+              // if (json_line.find("damping") != json_line.end()) {
+              //   constraint->setDamping(json_line["damping"].get<float>());
+              // }
+              constraint->setLinearLowerLimit(btVector3(0, 0, 0));
+              constraint->setLinearUpperLimit(btVector3(0, 0, 0));
+              constraint->setAngularLowerLimit(
+                    btVector3(
+                      json_line["angular_low"][0].get<float>(),
+                      json_line["angular_low"][1].get<float>(),
+                      json_line["angular_low"][2].get<float>()
+                      )
                   );
-              }
-              if (json_line.find("damping") != json_line.end()) {
-                constraint->setDamping(json_line["damping"].get<float>());
-              }
+              constraint->setAngularUpperLimit(
+                    btVector3(
+                      json_line["angular_high"][0].get<float>(),
+                      json_line["angular_high"][1].get<float>(),
+                      json_line["angular_high"][2].get<float>()
+                      )
+                  );
 
+// 		constraint->setLimit(0, 1, -1);
+// 		constraint->setLimit(1, 0, 0);
+// 		constraint->setLimit(2, 0, 0);
+// 		constraint->setLimit(3, 0, 0);
+// 		constraint->setLimit(4, 0, 0);
+// 		constraint->setLimit(5, 0, 0);
+// 		constraint->enableSpring(0, true);
+// 		constraint->setStiffness(0, 100);
+// #ifdef USE_6DOF2
+// 		constraint->setDamping(0, 0);
+// #else
+// 		constraint->setDamping(0, 1);
+// #endif
+// 		constraint->setEquilibriumPoint(0, 0);
+//
+//
+//
               constraint->getRigidBodyA().activate();
               constraint->getRigidBodyB().activate();
               
@@ -391,25 +448,25 @@ int main(int argc, char** argv)
             // if(it == motorJson.end()) {
             //   motorJson.insert(make_pair(json_line["id"].get<string>(),json_line));
             // } 
-            map<string, pair<btConeTwistConstraint*,json>>::iterator it = constraintMapPair.find(json_line["id"].get<string>());
+            map<string, pair<btGeneric6DofSpring2Constraint*,json>>::iterator it = constraintMapPair.find(json_line["id"].get<string>());
             if(it != constraintMapPair.end()) {
-              btConeTwistConstraint* constraint = it->second.first;
+              btGeneric6DofSpring2Constraint* constraint = it->second.first;
 
               std::cerr << "found constraint for id:" <<  json_line["id"].get<string>() << std::endl;
               // constraint->enableMotor(true);
-              constraint->enableMotor(json_line["enable"].get<bool>());
-              // constraint->setMaxMotorImpulseNormalized(0.01); 
-              constraint->setMaxMotorImpulseNormalized(json_line["impulse"].get<float>());
-              // constraint->setMaxMotorImpulse(json_line["impulse"].get<float>());
-              constraint->setMotorTargetInConstraintSpace(
-                    //btQuaternion(0.5,0.5,0.5,0.5)
-                    btQuaternion(
-                      json_line["target"][0].get<float>(),
-                      json_line["target"][1].get<float>(),
-                      json_line["target"][2].get<float>(),
-                      json_line["target"][3].get<float>()
-                    )
-                  );
+              // constraint->enableMotor(json_line["enable"].get<bool>());
+              // // constraint->setMaxMotorImpulseNormalized(0.01); 
+              // constraint->setMaxMotorImpulseNormalized(json_line["impulse"].get<float>());
+              // // constraint->setMaxMotorImpulse(json_line["impulse"].get<float>());
+              // constraint->setMotorTargetInConstraintSpace(
+              //       //btQuaternion(0.5,0.5,0.5,0.5)
+              //       btQuaternion(
+              //         json_line["target"][0].get<float>(),
+              //         json_line["target"][1].get<float>(),
+              //         json_line["target"][2].get<float>(),
+              //         json_line["target"][3].get<float>()
+              //       )
+              //     );
 
               constraint->getRigidBodyA().activate();
               constraint->getRigidBodyB().activate();
@@ -421,9 +478,9 @@ int main(int argc, char** argv)
 
           else if (json_line["command"].get<string>().compare("delete_joint") == 0) {
 
-            map<string, pair<btConeTwistConstraint*,json>>::iterator it = constraintMapPair.find(json_line["id"].get<string>());
+            map<string, pair<btGeneric6DofSpring2Constraint*,json>>::iterator it = constraintMapPair.find(json_line["id"].get<string>());
             if(it != constraintMapPair.end()) {
-              btConeTwistConstraint* constraint = it->second.first;
+              btGeneric6DofSpring2Constraint* constraint = it->second.first;
               dynamicsWorld->removeConstraint(constraint);
               constraintMapPair.erase(it);
             } 
@@ -471,9 +528,9 @@ int main(int argc, char** argv)
       // {
       //   json json_line = it->second;
       //   string bodyId = json_line["id"].get<string>();
-      //   map<string, pair<btConeTwistConstraint*,json>>::iterator constraintIt = constraintMapPair.find(bodyId);
+      //   map<string, pair<btGeneric6DofSpring2Constraint*,json>>::iterator constraintIt = constraintMapPair.find(bodyId);
       //   if(constraintIt != constraintMapPair.end()) {
-      //     btConeTwistConstraint* constraint = constraintIt->second.first;
+      //     btGeneric6DofSpring2Constraint* constraint = constraintIt->second.first;
       //
       //     // std::cerr << "apply motor to body id:" << bodyId << std::endl;
       //     constraint->enableMotor(true);

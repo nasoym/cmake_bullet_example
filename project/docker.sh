@@ -11,7 +11,13 @@ if [[ "${trace:=0}" -eq 1 ]];then
   export trace
 fi
 
-# apt-get install -y socat
+apt-get install -y socat
+apt-get install -y curl
+
+until curl -i -u "guest:guest" "http://rabbit:15672/api/queues"; do
+  echo waiting for rabbit
+  sleep 1
+done
 
 rm -rf /cmake_bullet/build || true
 mkdir -p /cmake_bullet/build 

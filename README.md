@@ -32,3 +32,11 @@ btContactSolverInfo& info = dynamicsWorld->getSolverInfo();
 info.m_numIterations = 50;
 https://pybullet.org/Bullet/BulletFull/classbtTypedConstraint.html
 
+
+
+For each axis:
+• Lowerlimit	==	Upperlimit	->	axis	is	locked.	
+• Lowerlimit	>	Upperlimit	->	axis	is	free	
+• Lowerlimit	<	Upperlimit	->	axis	it	limited	in	that	range	
+It	is	recommended	to	use	the	btGeneric6DofSpring2Constraint, it	has	some	
+improvements	over	the	original	btGeneric6Dof(Spring)Constraint.
