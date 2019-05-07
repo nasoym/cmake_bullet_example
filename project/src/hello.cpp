@@ -325,20 +325,21 @@ int main(int argc, char** argv)
                 constraint->setLimit(1, 0, 0);
                 constraint->setLimit(2, 0, 0);
                 constraint->setLimit(3, 0, 0);
-                constraint->setLimit(4, -1, 1);
+                // constraint->setLimit(4, -1, 1);
+                constraint->setLimit(4, 0, 0);
                 constraint->setLimit(5, 0, 0);
 
-                constraint->setBounce(4, 1);
-                constraint->enableSpring(4, true);
-                constraint->setStiffness(4, 100);
-                constraint->setDamping(4, 0);
-                // setEquilibriumPoint (int index, btScalar val)
-
-                constraint->enableMotor(4, true);
-                constraint->setTargetVelocity(4, 3.f);
-                constraint->setMaxMotorForce(4, 600.f);
-                constraint->setServo(4, true);
-                constraint->setServoTarget(4, 0.9);
+                // constraint->setBounce(4, 1);
+                // constraint->enableSpring(4, true);
+                // constraint->setStiffness(4, 100);
+                // constraint->setDamping(4, 0);
+                // // setEquilibriumPoint (int index, btScalar val)
+                //
+                // constraint->enableMotor(4, true);
+                // constraint->setTargetVelocity(4, 3.f);
+                // constraint->setMaxMotorForce(4, 600.f);
+                // constraint->setServo(4, true);
+                // constraint->setServoTarget(4, 0.9);
 
 
 
@@ -437,8 +438,7 @@ int main(int argc, char** argv)
               }
 /*
 index:0,
-lowerlimit:
-upperlimit:
+limits:[]
 bounce
 spring
 stiffness

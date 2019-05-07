@@ -108,10 +108,14 @@ echo "$id $id1 $id2"
 elif [ "$1" = "joint_settings" ];then shift ##
   id="$1"; shift
   echo -ne "\
-{\"command\":\"joint_settings\",\"id\":\"${id}\",\"angular_low\":[0.0,0.0,0.0],\"angular_high\":[0.0,0.0,0.0]}
+{\"command\":\"joint_settings\",\"id\":\"${id}\",\"settings\":[{\"index\":0,\"limits\":[0,0],\"bounce\":0,\"spring\":true,\"stiffness\":0,\"damping\":0,\"equilibrium\":0,\"motor\":true,\"targetvelocity\":0,\"maxmotorforce\":0,\"servo\":true,\"servotarget\":0}]}
 " \
  | socat - TCP:localhost:9999
 # {\"command\":\"joint_limit\",\"id\":\"${id}\",\"limits\":[0.0,0.5,0.5,1.0,0.3,1.0],\"damping\":0.01}
+# {\"command\":\"joint_settings\",\"id\":\"${id}\",\"angular_low\":[0.0,0.0,0.0],\"angular_high\":[0.0,0.0,0.0]}
+
+\"settings\":[ {\"index\":0,\"limits\":[0,0],\"bounce\":0,\"spring\":true,\"stiffness\":0,\"damping\":0,\"equilibrium\":0,\"motor\":true,\"targetvelocity\":0,\"maxmotorforce\":0,\"servo\":true,\"servotarget\":0} ]
+
 
 elif [ "$1" = "joint_motor_off" ];then shift ##
   id="$1"; shift

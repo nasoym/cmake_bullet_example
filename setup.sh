@@ -27,7 +27,7 @@ elif [[ "$1" == "create_ec2" ]];then shift
 elif [[ "$1" == "setup_ec2" ]];then shift
   provision_ec2 docker ${ec2_host}
   ${0} scp
-  ${0} mount
+  # ${0} mount
   ${0} ports
   ${0} launch
 
