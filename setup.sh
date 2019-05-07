@@ -44,7 +44,7 @@ elif [[ "$1" == "scp" ]];then shift
 elif [[ "$1" == "mount" ]];then shift
   mv ${self_dir}/project ${self_dir}/project_backup
   mkdir ${self_dir}/project
-  sshfs ec2-user@$(ec2 get-ip ${ec2_host}):/home/ec2-user/cmake_bullet_example/project ${self_dir}/project
+  sshfs -o ssh_command='ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no' ec2-user@$(ec2 get-ip ${ec2_host}):/home/ec2-user/cmake_bullet_example/project ${self_dir}/project
   # -o ssh_command='ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no '
 
 elif [[ "$1" == "launch" ]];then shift

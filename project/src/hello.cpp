@@ -388,6 +388,8 @@ int main(int argc, char** argv)
             if(it != constraintMapPair.end()) {
               btGeneric6DofSpring2Constraint* constraint = it->second.first;
 
+              std::cerr << "set joint settings:" <<  json_line["id"].get<string>() << std::endl;
+              // std::cerr << "set joint settings:" <<  json_line["settings"].size() << std::endl;
               if (json_line["settings"].is_array()) {
                 json setting;
                 int index;
@@ -395,40 +397,37 @@ int main(int argc, char** argv)
                   setting = json_line["settings"][i];
                   index = setting["index"].get<int>();
                   if (setting.find("damping") != setting.end()) {
-                    constraint->setDamping(index, json_line["damping"].get<float>());
+                    constraint->setDamping(index, setting["damping"].get<float>());
                   }
                   if (setting.find("stiffness") != setting.end()) {
-                    constraint->setStiffness(index, json_line["stiffness"].get<float>());
+                    constraint->setStiffness(index, setting["stiffness"].get<float>());
                   }
                   if (setting.find("spring") != setting.end()) {
-                    constraint->enableSpring(index, json_line["spring"].get<bool>());
+                    constraint->enableSpring(index, setting["spring"].get<bool>());
                   }
                   if (setting.find("bounce") != setting.end()) {
-                    constraint->setBounce(index, json_line["bounce"].get<float>());
+                    constraint->setBounce(index, setting["bounce"].get<float>());
                   }
                   if (setting.find("equilibrium") != setting.end()) {
-                    constraint->setEquilibriumPoint(index, json_line["equilibrium"].get<float>());
+                    constraint->setEquilibriumPoint(index, setting["equilibrium"].get<float>());
                   }
                   if (setting.find("targetvelocity") != setting.end()) {
-                    constraint->setTargetVelocity(index, json_line["targetvelocity"].get<float>());
+                    constraint->setTargetVelocity(index, setting["targetvelocity"].get<float>());
                   }
                   if (setting.find("maxmotorforce") != setting.end()) {
-                    constraint->setMaxMotorForce(index, json_line["maxmotorforce"].get<float>());
-                  }
-                  if (setting.find("maxmotorforce") != setting.end()) {
-                    constraint->setMaxMotorForce(index, json_line["maxmotorforce"].get<float>());
+                    constraint->setMaxMotorForce(index, setting["maxmotorforce"].get<float>());
                   }
                   if (setting.find("servotarget") != setting.end()) {
-                    constraint->setServoTarget(index, json_line["servotarget"].get<float>());
+                    constraint->setServoTarget(index, setting["servotarget"].get<float>());
                   }
                   if (setting.find("motor") != setting.end()) {
-                    constraint->enableMotor(index, json_line["motor"].get<bool>());
+                    constraint->enableMotor(index, setting["motor"].get<bool>());
                   }
                   if (setting.find("servo") != setting.end()) {
-                    constraint->setServo(index, json_line["servo"].get<bool>());
+                    constraint->setServo(index, setting["servo"].get<bool>());
                   }
                   if (setting.find("limits") != setting.end()) {
-                    constraint->setLimit(index, json_line["limits"][0].get<float>(), json_line["limits"][1].get<float>());
+                    constraint->setLimit(index, setting["limits"][0].get<float>(), setting["limits"][1].get<float>());
                   }
 
 
@@ -452,7 +451,6 @@ servotarget
 */
 
 
-              std::cerr << "set joint settings:" <<  json_line["id"].get<string>() << std::endl;
               // if (json_line.find("limits") != json_line.end()) {
               //   constraint->setLimit(
               //     json_line["limits"][0].get<float>(),
@@ -466,22 +464,22 @@ servotarget
               // if (json_line.find("damping") != json_line.end()) {
               //   constraint->setDamping(json_line["damping"].get<float>());
               // }
-              constraint->setLinearLowerLimit(btVector3(0, 0, 0));
-              constraint->setLinearUpperLimit(btVector3(0, 0, 0));
-              constraint->setAngularLowerLimit(
-                    btVector3(
-                      json_line["angular_low"][0].get<float>(),
-                      json_line["angular_low"][1].get<float>(),
-                      json_line["angular_low"][2].get<float>()
-                      )
-                  );
-              constraint->setAngularUpperLimit(
-                    btVector3(
-                      json_line["angular_high"][0].get<float>(),
-                      json_line["angular_high"][1].get<float>(),
-                      json_line["angular_high"][2].get<float>()
-                      )
-                  );
+              // constraint->setLinearLowerLimit(btVector3(0, 0, 0));
+              // constraint->setLinearUpperLimit(btVector3(0, 0, 0));
+              // constraint->setAngularLowerLimit(
+              //       btVector3(
+              //         json_line["angular_low"][0].get<float>(),
+              //         json_line["angular_low"][1].get<float>(),
+              //         json_line["angular_low"][2].get<float>()
+              //         )
+              //     );
+              // constraint->setAngularUpperLimit(
+              //       btVector3(
+              //         json_line["angular_high"][0].get<float>(),
+              //         json_line["angular_high"][1].get<float>(),
+              //         json_line["angular_high"][2].get<float>()
+              //         )
+              //     );
 
 // 		constraint->setLimit(0, 1, -1);
 // 		constraint->setLimit(1, 0, 0);
