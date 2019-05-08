@@ -1,9 +1,12 @@
 # cmake_bullet_example
 
 
-https://stackoverflow.com/questions/12778229/what-does-step-mean-in-stepsimulation-and-what-do-its-parameters-mean-in-bulle
-
 ## todos
+  * debug bodies 
+    * absolute (transparent)
+    * body relative (pos,rot)
+  * show body id on three.js touch
+  * -----
   * solve ik target
   * -----
   * change body settings (mass,..)
@@ -13,6 +16,8 @@ https://stackoverflow.com/questions/12778229/what-does-step-mean-in-stepsimulati
   * -----
   * delete collision shape
   * create plane/sphere
+
+https://stackoverflow.com/questions/12778229/what-does-step-mean-in-stepsimulation-and-what-do-its-parameters-mean-in-bulle
 
 https://stackoverflow.com/questions/45691950/how-to-achieve-maximum-simulation-accuracy-in-bullet
 gDynamicsWorld->stepSimulation(SIMULATION_STEP_TIME, 1, 1.0f/60.0f);

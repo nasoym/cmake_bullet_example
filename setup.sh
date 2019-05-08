@@ -14,8 +14,12 @@ fi
 self_dir="$(dirname $(realpath $0))"
 
 : ${ec2_host:="bullet_host"}
+
 if [[ "$#" -eq 0 ]];then
-  :
+  ${0} help
+
+elif [[ "$1" == "help" ]];then shift
+  which bash_scripts >/dev/null && bash_scripts show_commands ${0}
 
 elif [[ "$1" == "create_ec2" ]];then shift
   export security_group="bullet"
