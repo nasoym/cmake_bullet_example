@@ -34,8 +34,12 @@ elif [[ "$1" == "setup_ec2" ]];then shift
 elif [[ "$1" == "show_ip" ]];then shift
   ec2 get-ip ${ec2_host}
 
-elif [[ "$1" == "restart_bullet" ]];then shift
-  ec2 ssh ${ec2_host} 'cd /home/ec2-user/cmake_bullet_example/project; docker-compose restart bullet; docker-compose  logs -t --tail=10 -f bullet'
+elif [[ "$1" == "bullet_logs" ]];then shift
+  ec2 ssh ${ec2_host} 'cd /home/ec2-user/cmake_bullet_example/project; docker-compose  logs -t --tail=10 -f bullet'
+
+elif [[ "$1" == "bullet_restart" ]];then shift
+  ec2 ssh ${ec2_host} 'cd /home/ec2-user/cmake_bullet_example/project; docker-compose restart bullet'
+  ${0} bullet_logs
 
 elif [[ "$1" == "restore" ]];then shift
   ec2 delete ${ec2_host}
