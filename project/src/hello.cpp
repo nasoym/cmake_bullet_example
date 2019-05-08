@@ -85,11 +85,7 @@ int main(int argc, char** argv)
   fds.events = POLLIN;
   int poll_return;
 
-  // int sleep_time = 2000;
-  // int sleep_time = 100;
-  // int sleep_time = 1000;
   int sleep_time = 40;
-  // int sleep_time = 16;
 
   deque<string> line_deque;
 

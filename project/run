@@ -192,8 +192,9 @@ elif [ "$1" = "clear" ];then shift
   | socat - TCP:localhost:9999
 
 elif [ "$1" = "set" ];then shift
-  # : ${id="sleep_time"}
-  # : ${value="100"}
+  # solver_iterations 100 
+  # sleep_time 40 (25fps)
+
   id="$1";shift
   value="$1"; shift
   jq -M -c -n --arg id "$id" --arg value "$value" \
