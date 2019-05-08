@@ -5,6 +5,7 @@ https://stackoverflow.com/questions/12778229/what-does-step-mean-in-stepsimulati
 
 ## todos
   * handle json array input line
+  * exit command
   * -----
   * delete collision shape
   * create plane/sphere
