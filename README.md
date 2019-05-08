@@ -40,3 +40,13 @@ For each axis:
 • Lowerlimit	<	Upperlimit	->	axis	it	limited	in	that	range	
 It	is	recommended	to	use	the	btGeneric6DofSpring2Constraint, it	has	some	
 improvements	over	the	original	btGeneric6Dof(Spring)Constraint.
+
+
+
+https://knowledge.autodesk.com/support/maya/learn-explore/caas/CloudHelp/cloudhelp/2018/ENU/Maya-SimulationEffects/files/GUID-CDB3638D-23AF-49EF-8EF6-53081EE4D39D-htm.html
+https://docs.lightwave3d.com/lw2019/reference/simulation/bullet-dynamics/bullet-constraints
+https://www.sidefx.com/docs/houdini/nodes/dop/bulletrbdsolver.html
+https://docs.unrealengine.com/en-us/Engine/Physics/FrictionRestitutionAndDamping
+
+
+
