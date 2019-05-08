@@ -14,7 +14,7 @@ fi
 # jq -n -c \
 #   --arg id "$RANDOM" \
 #   '{
-#   command:"create",
+#   command:"body_create",
 #   id:$id,
 #   mass:1,
 #   size:[5,5,5],
@@ -50,19 +50,29 @@ elif [ "$1" = "build" ];then shift ##
 
 
 elif [ "$1" = "base" ];then shift ##
-  echo -ne "\
-{\"command\":\"create\",\"id\":\"${RANDOM}\",\"mass\":0,\"size\":[200,200,10],\"pos\":[0,0,-10]}
-" \
- | socat - TCP:localhost:9999
+  jq -M -c -n --arg id "${RANDOM}" \
+    '{
+      command:"body_create",
+      id:$id,
+      mass:0,
+      size:[200,200,10],
+      pos:[0,0,-10]
+    }' \
+  | socat - TCP:localhost:9999
 
-elif [ "$1" = "single" ];then shift ##
+elif [ "$1" = "body_create" ];then shift ##
   id="$1"; shift
-  echo -ne "\
-{\"command\":\"create\",\"id\":\"${id}\",\"mass\":1,\"size\":[1,1,1],\"pos\":[0,0,10]}
-" \
+  jq -M -c -n --arg id "$id" \
+    '{
+      command:"body_create",
+      id:$id,
+      mass:1,
+      size:[1,1,1],
+      pos:[0,0,10]
+    }' \
  | socat - TCP:localhost:9999
 
-elif [ "$1" = "impulse" ];then shift ##
+elif [ "$1" = "body_impulse" ];then shift ##
   id="$1"; shift
   : ${x:=10}
   : ${y:=0}
@@ -77,71 +87,22 @@ elif [ "$1" = "impulse" ];then shift ##
     }' \
     | socat - TCP:localhost:9999
 
-elif [ "$1" = "joint_find_body" ];then shift ##
-  id="$1"; shift
-  echo -ne "\
-{\"command\":\"joint_find_body\",\"id\":\"${id}\"}
-" \
- | socat - TCP:localhost:9999
-
-elif [ "$1" = "list_joints" ];then shift ##
-  echo -ne "\
-{\"command\":\"list_joints\"}
-" \
- | socat - TCP:localhost:9999
-
-elif [ "$1" = "test" ];then shift ##
+elif [ "$1" = "joint_create" ];then shift ##
   id="${RANDOM}"
   id1="${RANDOM}1"
   id2="${RANDOM}2"
   echo -ne "\
-{\"command\":\"create\",\"id\":\"${id1}\",\"mass\":0,\"size\":[1.5,2.5,4],\"pos\":[0,0,16]}
-{\"command\":\"create\",\"id\":\"${id2}\",\"mass\":0,\"size\":[1,2,4],\"pos\":[0,0,20]}
+{\"command\":\"body_create\",\"id\":\"${id1}\",\"mass\":0,\"size\":[1.5,2.5,4],\"pos\":[0,0,16]}
+{\"command\":\"body_create\",\"id\":\"${id2}\",\"mass\":1,\"size\":[1,2,4],\"pos\":[0,0,20]}
+{\"command\":\"joint_create\",\"id\":\"${id}\",\"id1\":\"${id1}\",\"id2\":\"${id2}\",\"pos1\":[0,0,2],\"rot1\":[0,0,0,1],\"pos2\":[0,0,-2],\"rot2\":[0,0,0,1]}
 " \
  | socat - TCP:localhost:9999
-
-elif [ "$1" = "joint" ];then shift ##
-  id="${RANDOM}"
-  id1="${RANDOM}1"
-  id2="${RANDOM}2"
-  echo -ne "\
-{\"command\":\"create\",\"id\":\"${id1}\",\"mass\":0,\"size\":[1.5,2.5,4],\"pos\":[0,0,16]}
-{\"command\":\"create\",\"id\":\"${id2}\",\"mass\":1,\"size\":[1,2,4],\"pos\":[0,0,20]}
-{\"command\":\"joint\",\"id\":\"${id}\",\"id1\":\"${id1}\",\"id2\":\"${id2}\",\"pos1\":[0,0,2],\"rot1\":[0,0,0,1],\"pos2\":[0,0,-2],\"rot2\":[0,0,0,1]}
-" \
- | socat - TCP:localhost:9999
-# {\"command\":\"joint\",\"id1\":\"${id1}\",\"id2\":\"${id2}\",\"pos1\":[0,0,1.5],\"pos2\":[0,0,-1.5],\"limitlower\":[0,1,0],\"limitupper\":[0,-1,0]}
+# {\"command\":\"joint_create\",\"id1\":\"${id1}\",\"id2\":\"${id2}\",\"pos1\":[0,0,1.5],\"pos2\":[0,0,-1.5],\"limitlower\":[0,1,0],\"limitupper\":[0,-1,0]}
 # {\"command\":\"joint2\",\"id1\":\"${id1}\",\"id2\":\"${id2}\",\"pos1\":[0,0,2],\"rot1\":[0,0,0,1],\"pos2\":[0,0,-2],\"rot2\":[0,0,0,1],\"limits\":[0,1.6,0.1,1.0,0.3,1.0],\"damping\":0.01}
 
-echo "$id $id1 $id2"
-                # // setLimit (
-                #   // btScalar _swingSpan1, 
-                #   // btScalar _swingSpan2, 
-                #   // btScalar _twistSpan, 
-                #   // btScalar _softness=1.f, 
-                #   // btScalar _biasFactor=0.3f, 
-                #   // btScalar _relaxationFactor=1.0f)
-                #   // setDamping (btScalar damping) 0.01
+echo "joint:$id body1:$id1 body2:$id2"
 
 elif [ "$1" = "joint_settings" ];then shift ##
-  id="$1"; shift
-  echo -ne "\
-{\"command\":\"joint_settings\",\"id\":\"${id}\",\"settings\":[{\"index\":0,\"limits\":[0,0],\"bounce\":0,\"spring\":true,\"stiffness\":0,\"damping\":0,\"equilibrium\":0,\"motor\":true,\"targetvelocity\":0,\"maxmotorforce\":0,\"servo\":true,\"servotarget\":0}]}
-" \
- | socat - TCP:localhost:9999
-# {\"command\":\"joint_limit\",\"id\":\"${id}\",\"limits\":[0.0,0.5,0.5,1.0,0.3,1.0],\"damping\":0.01}
-# {\"command\":\"joint_settings\",\"id\":\"${id}\",\"angular_low\":[0.0,0.0,0.0],\"angular_high\":[0.0,0.0,0.0]}
-
-# \"settings\":[ {\"index\":0,\"limits\":[0,0],\"bounce\":0,\"spring\":true,\"stiffness\":0,\"damping\":0,\"equilibrium\":0,\"motor\":true,\"targetvelocity\":0,\"maxmotorforce\":0,\"servo\":true,\"servotarget\":0} ]
-
-elif [ "$1" = "joint_settings_1" ];then shift ##
-  id="$1"; shift
-  echo -ne "\
-{\"command\":\"joint_settings\",\"id\":\"${id}\",\"settings\":[{\"index\":4,\"limits\":[-1,1],\"bounce\":1,\"spring\":true,\"stiffness\":100,\"damping\":0}]}
-" \
- | socat - TCP:localhost:9999
-
-elif [ "$1" = "joint_settings_1c" ];then shift ##
   id="$1"; shift
   jq -M -c -n --arg id "$id" \
     '{
@@ -159,84 +120,73 @@ elif [ "$1" = "joint_settings_1c" ];then shift ##
       ]
     }' | socat - TCP:localhost:9999
 
-elif [ "$1" = "joint_settings_1b" ];then shift ##
+elif [ "$1" = "joint_settings_force" ];then shift ##
   id="$1"; shift
-  echo -ne "\
-{\"command\":\"joint_settings\",\"id\":\"${id}\",\"settings\":[{\"index\":3,\"limits\":[-2,2],\"bounce\":1,\"spring\":true,\"stiffness\":100,\"damping\":0}]}
-" \
- | socat - TCP:localhost:9999
-
-elif [ "$1" = "joint_settings_2" ];then shift ##
-  id="$1"; shift
-  echo -ne "\
-{\"command\":\"joint_settings\",\"id\":\"${id}\",\"settings\":[{\"index\":4,\"motor\":true,\"targetvelocity\":3.0,\"maxmotorforce\":600,\"servo\":true,\"servotarget\":-0.9}]}
-" \
- | socat - TCP:localhost:9999
-elif [ "$1" = "joint_settings_2b" ];then shift ##
-  id="$1"; shift
-  echo -ne "\
-{\"command\":\"joint_settings\",\"id\":\"${id}\",\"settings\":[{\"index\":3,\"motor\":true,\"targetvelocity\":3.0,\"maxmotorforce\":600,\"servo\":true,\"servotarget\":-0.5}]}
-" \
- | socat - TCP:localhost:9999
-
-
-elif [ "$1" = "joint_motor_off" ];then shift ##
-  id="$1"; shift
-  echo -ne "\
-{\"command\":\"joint_motor\",\"id\":\"${id}\",\"enable\":false,\"impulse\":0.1,\"target\":[0,0,0,1]}
-" \
- | socat - TCP:localhost:9999
-# {\"command\":\"joint_motor\",\"id\":\"${id}\",\"enable\":true,\"impulse\":0.1,\"target\":[0.5,0.5,0.5,0.5]}
-
-elif [ "$1" = "joint_motor" ];then shift ##
-  id="$1"; shift
-  echo -ne "\
-{\"command\":\"joint_motor\",\"id\":\"${id}\",\"enable\":true,\"impulse\":1.0,\"target\":[0,0,0,1]}
-" \
- | socat - TCP:localhost:9999
-# {\"command\":\"joint_motor\",\"id\":\"${id}\",\"enable\":true,\"impulse\":0.1,\"target\":[0.5,0.5,0.5,0.5]}
+  jq -M -c -n --arg id "$id" \
+    '{
+      command:"joint_settings",
+      id:$id,
+      settings:[
+        {
+          index:4,
+          motor:true,
+          targetvelocity:3.0,
+          maxmotorforce:600,
+          servo:true,
+          servotarget:-0.5
+        }
+      ]
+    }' | socat - TCP:localhost:9999
 
 elif [ "$1" = "joint_delete" ];then shift ##
   id="$1"; shift
-  echo -ne "\
-{\"command\":\"delete_joint\",\"id\":\"${id}\"}
-" \
- | socat - TCP:localhost:9999
+  jq -M -c -n --arg id "$id" \
+    '{
+      command:"joint_delete",
+      id:$id
+    }' \
+  | socat - TCP:localhost:9999
 
-elif [ "$1" = "delete" ];then shift ##
+elif [ "$1" = "body_delete" ];then shift ##
   id="$1"; shift
-  echo -ne "\
-{\"command\":\"delete\",\"id\":\"${id}\"}
-" \
- | socat - TCP:localhost:9999
+  jq -M -c -n --arg id "$id" \
+    '{
+      command:"body_delete",
+      id:$id
+    }' \
+  | socat - TCP:localhost:9999
 
 elif [ "$1" = "clear" ];then shift ##
-  echo -ne "\
-{\"command\":\"clear\"}
-" \
- | socat - TCP:localhost:9999
+  jq -M -c -n \
+    '{
+      command:"clear"
+    }' \
+  | socat - TCP:localhost:9999
 
 elif [ "$1" = "set" ];then shift ##
   # : ${id="sleep_time"}
   # : ${value="100"}
   id="$1";shift
   value="$1"; shift
-  echo -ne "\
-{\"command\":\"set\",\"id\":\"${id}\",\"value\":${value}}
-" \
- | socat - TCP:localhost:9999
+  jq -M -c -n --arg id "$id" --arg value "$value" \
+    '{
+      command:"set",
+      id:$id,
+      value:($value|tonumber)
+    }' \
+  | socat - TCP:localhost:9999
 
 elif [ "$1" = "stack" ];then shift ##
   echo -ne "\
-{\"command\":\"create\",\"id\":\"${RANDOM}\",\"mass\":1,\"size\":[1,1,1],\"pos\":[0,0,20]}
-{\"command\":\"create\",\"id\":\"${RANDOM}\",\"mass\":1,\"size\":[1,1,1],\"pos\":[0,0,21]}
-{\"command\":\"create\",\"id\":\"${RANDOM}\",\"mass\":1,\"size\":[1,1,1],\"pos\":[0,0,22]}
-{\"command\":\"create\",\"id\":\"${RANDOM}\",\"mass\":1,\"size\":[1,1,1],\"pos\":[0,0,23]}
-{\"command\":\"create\",\"id\":\"${RANDOM}\",\"mass\":1,\"size\":[1,1,1],\"pos\":[0,0,24]}
-{\"command\":\"create\",\"id\":\"${RANDOM}\",\"mass\":1,\"size\":[1,1,1],\"pos\":[0,0,25]}
-{\"command\":\"create\",\"id\":\"${RANDOM}\",\"mass\":1,\"size\":[1,1,1],\"pos\":[0,0,26]}
-{\"command\":\"create\",\"id\":\"${RANDOM}\",\"mass\":1,\"size\":[1,1,1],\"pos\":[0,0,27]}
-{\"command\":\"create\",\"id\":\"${RANDOM}\",\"mass\":1,\"size\":[1,1,1],\"pos\":[0,0,28]}
+{\"command\":\"body_create\",\"id\":\"${RANDOM}\",\"mass\":1,\"size\":[1,1,1],\"pos\":[0,0,20]}
+{\"command\":\"body_create\",\"id\":\"${RANDOM}\",\"mass\":1,\"size\":[1,1,1],\"pos\":[0,0,21]}
+{\"command\":\"body_create\",\"id\":\"${RANDOM}\",\"mass\":1,\"size\":[1,1,1],\"pos\":[0,0,22]}
+{\"command\":\"body_create\",\"id\":\"${RANDOM}\",\"mass\":1,\"size\":[1,1,1],\"pos\":[0,0,23]}
+{\"command\":\"body_create\",\"id\":\"${RANDOM}\",\"mass\":1,\"size\":[1,1,1],\"pos\":[0,0,24]}
+{\"command\":\"body_create\",\"id\":\"${RANDOM}\",\"mass\":1,\"size\":[1,1,1],\"pos\":[0,0,25]}
+{\"command\":\"body_create\",\"id\":\"${RANDOM}\",\"mass\":1,\"size\":[1,1,1],\"pos\":[0,0,26]}
+{\"command\":\"body_create\",\"id\":\"${RANDOM}\",\"mass\":1,\"size\":[1,1,1],\"pos\":[0,0,27]}
+{\"command\":\"body_create\",\"id\":\"${RANDOM}\",\"mass\":1,\"size\":[1,1,1],\"pos\":[0,0,28]}
 " \
  | socat - TCP:localhost:9999
 
