@@ -4,6 +4,10 @@
 https://stackoverflow.com/questions/12778229/what-does-step-mean-in-stepsimulation-and-what-do-its-parameters-mean-in-bulle
 
 ## todos
+  * solve ik target
+  * -----
+  * change body settings (mass,..)
+  * -----
   * handle json array input line
   * exit command
   * -----

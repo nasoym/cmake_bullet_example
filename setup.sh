@@ -42,8 +42,8 @@ elif [[ "$1" == "bullet_restart" ]];then shift
   ${0} bullet_logs
 
 elif [[ "$1" == "restore" ]];then shift
-  ec2 delete ${ec2_host}
   sudo umount ${self_dir}/project
+  ec2 delete ${ec2_host}
   rm -rf project
   rm -rf project_backup
   git reset --hard HEAD
