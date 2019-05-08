@@ -40,6 +40,15 @@ elif [ "$1" = "body_create" ];then shift
     }' \
  | socat - TCP:localhost:9999
 
+elif [ "$1" = "body_delete" ];then shift
+  id="$1"; shift
+  jq -M -c -n --arg id "$id" \
+    '{
+      command:"body_delete",
+      id:$id
+    }' \
+  | socat - TCP:localhost:9999
+
 elif [ "$1" = "body_impulse" ];then shift
   id="$1"; shift
   : ${x:=10}
@@ -91,6 +100,15 @@ elif [ "$1" = "joint_create" ];then shift
   | socat - TCP:localhost:9999
   echo "joint:$id body1:$id1 body2:$id2"
 
+elif [ "$1" = "joint_delete" ];then shift
+  id="$1"; shift
+  jq -M -c -n --arg id "$id" \
+    '{
+      command:"joint_delete",
+      id:$id
+    }' \
+  | socat - TCP:localhost:9999
+
 elif [ "$1" = "joint_settings" ];then shift
   id="$1"; shift
   jq -M -c -n --arg id "$id" \
@@ -126,24 +144,6 @@ elif [ "$1" = "joint_settings_force" ];then shift
         }
       ]
     }' | socat - TCP:localhost:9999
-
-elif [ "$1" = "joint_delete" ];then shift
-  id="$1"; shift
-  jq -M -c -n --arg id "$id" \
-    '{
-      command:"joint_delete",
-      id:$id
-    }' \
-  | socat - TCP:localhost:9999
-
-elif [ "$1" = "body_delete" ];then shift
-  id="$1"; shift
-  jq -M -c -n --arg id "$id" \
-    '{
-      command:"body_delete",
-      id:$id
-    }' \
-  | socat - TCP:localhost:9999
 
 elif [ "$1" = "clear" ];then shift
   jq -M -c -n \
