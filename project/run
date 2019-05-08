@@ -11,45 +11,13 @@ if [[ "${trace:=0}" -eq 1 ]];then
   export trace
 fi
 
-# jq -n -c \
-#   --arg id "$RANDOM" \
-#   '{
-#   command:"body_create",
-#   id:$id,
-#   mass:1,
-#   size:[5,5,5],
-#   pos:[0,0,20]
-# }' \
-#   | socat - TCP:localhost:9999
-
 if [[ "$#" -eq 0 ]];then
-  :
   ${0} help
 
 elif [[ "$1" == "help" ]];then shift
   which bash_scripts >/dev/null && bash_scripts show_commands ${0}
 
-elif [ "$1" = "docker" ];then shift ##
-  docker run --name rabbit -d -p 5672:5672 -p 15672:15672 -p 15674:15674 activiti/rabbitmq-stomp
-
-elif [ "$1" = "run" ];then shift ##
-  socat TCP-LISTEN:9999,reuseaddr,fork STDOUT | ./build_cmake/hello \
-    | python3 src/python_pika_write.py
-
-elif [ "$1" = "run_docker" ];then shift ##
-  socat TCP-LISTEN:9999,reuseaddr,fork STDOUT \
-    | ./build/hello \
-    | rabbit_host="rabbit" python3 src/python_pika_write.py
-
-elif [ "$1" = "build" ];then shift ##
-  rm -rf build_cmake
-  mkdir -p build_cmake 
-  cd build_cmake 
-  cmake ../ 
-  make
-
-
-elif [ "$1" = "base" ];then shift ##
+elif [ "$1" = "base" ];then shift
   jq -M -c -n --arg id "${RANDOM}" \
     '{
       command:"body_create",
@@ -60,7 +28,7 @@ elif [ "$1" = "base" ];then shift ##
     }' \
   | socat - TCP:localhost:9999
 
-elif [ "$1" = "body_create" ];then shift ##
+elif [ "$1" = "body_create" ];then shift
   id="$1"; shift
   jq -M -c -n --arg id "$id" \
     '{
@@ -72,7 +40,7 @@ elif [ "$1" = "body_create" ];then shift ##
     }' \
  | socat - TCP:localhost:9999
 
-elif [ "$1" = "body_impulse" ];then shift ##
+elif [ "$1" = "body_impulse" ];then shift
   id="$1"; shift
   : ${x:=10}
   : ${y:=0}
@@ -87,22 +55,43 @@ elif [ "$1" = "body_impulse" ];then shift ##
     }' \
     | socat - TCP:localhost:9999
 
-elif [ "$1" = "joint_create" ];then shift ##
+elif [ "$1" = "joint_create" ];then shift
   id="${RANDOM}"
   id1="${RANDOM}1"
   id2="${RANDOM}2"
-  echo -ne "\
-{\"command\":\"body_create\",\"id\":\"${id1}\",\"mass\":0,\"size\":[1.5,2.5,4],\"pos\":[0,0,16]}
-{\"command\":\"body_create\",\"id\":\"${id2}\",\"mass\":1,\"size\":[1,2,4],\"pos\":[0,0,20]}
-{\"command\":\"joint_create\",\"id\":\"${id}\",\"id1\":\"${id1}\",\"id2\":\"${id2}\",\"pos1\":[0,0,2],\"rot1\":[0,0,0,1],\"pos2\":[0,0,-2],\"rot2\":[0,0,0,1]}
-" \
- | socat - TCP:localhost:9999
-# {\"command\":\"joint_create\",\"id1\":\"${id1}\",\"id2\":\"${id2}\",\"pos1\":[0,0,1.5],\"pos2\":[0,0,-1.5],\"limitlower\":[0,1,0],\"limitupper\":[0,-1,0]}
-# {\"command\":\"joint2\",\"id1\":\"${id1}\",\"id2\":\"${id2}\",\"pos1\":[0,0,2],\"rot1\":[0,0,0,1],\"pos2\":[0,0,-2],\"rot2\":[0,0,0,1],\"limits\":[0,1.6,0.1,1.0,0.3,1.0],\"damping\":0.01}
+  jq -M -c -n --arg id "${id}" --arg id1 "${id1}" --arg id2 "${id2}" \
+    '
+      {
+        command:"body_create",
+        id:$id1,
+        mass:0,
+        size:[1.5,2.5,4],
+        pos:[0,0,16]
+      }
+      ,
+      {
+        command:"body_create",
+        id:$id2,
+        mass:1,
+        size:[1.0,2.0,4],
+        pos:[0,0,20]
+      }
+      ,
+      {
+        command:"joint_create",
+        id:$id,
+        id1:$id1,
+        id2:$id2,
+        pos1:[0,0,2],
+        pos2:[0,0,-2],
+        rot1:[0,0,0,1],
+        rot2:[0,0,0,1]
+      }
+    ' \
+  | socat - TCP:localhost:9999
+  echo "joint:$id body1:$id1 body2:$id2"
 
-echo "joint:$id body1:$id1 body2:$id2"
-
-elif [ "$1" = "joint_settings" ];then shift ##
+elif [ "$1" = "joint_settings" ];then shift
   id="$1"; shift
   jq -M -c -n --arg id "$id" \
     '{
@@ -120,7 +109,7 @@ elif [ "$1" = "joint_settings" ];then shift ##
       ]
     }' | socat - TCP:localhost:9999
 
-elif [ "$1" = "joint_settings_force" ];then shift ##
+elif [ "$1" = "joint_settings_force" ];then shift
   id="$1"; shift
   jq -M -c -n --arg id "$id" \
     '{
@@ -138,7 +127,7 @@ elif [ "$1" = "joint_settings_force" ];then shift ##
       ]
     }' | socat - TCP:localhost:9999
 
-elif [ "$1" = "joint_delete" ];then shift ##
+elif [ "$1" = "joint_delete" ];then shift
   id="$1"; shift
   jq -M -c -n --arg id "$id" \
     '{
@@ -147,7 +136,7 @@ elif [ "$1" = "joint_delete" ];then shift ##
     }' \
   | socat - TCP:localhost:9999
 
-elif [ "$1" = "body_delete" ];then shift ##
+elif [ "$1" = "body_delete" ];then shift
   id="$1"; shift
   jq -M -c -n --arg id "$id" \
     '{
@@ -156,14 +145,14 @@ elif [ "$1" = "body_delete" ];then shift ##
     }' \
   | socat - TCP:localhost:9999
 
-elif [ "$1" = "clear" ];then shift ##
+elif [ "$1" = "clear" ];then shift
   jq -M -c -n \
     '{
       command:"clear"
     }' \
   | socat - TCP:localhost:9999
 
-elif [ "$1" = "set" ];then shift ##
+elif [ "$1" = "set" ];then shift
   # : ${id="sleep_time"}
   # : ${value="100"}
   id="$1";shift
@@ -176,7 +165,7 @@ elif [ "$1" = "set" ];then shift ##
     }' \
   | socat - TCP:localhost:9999
 
-elif [ "$1" = "stack" ];then shift ##
+elif [ "$1" = "stack" ];then shift
   echo -ne "\
 {\"command\":\"body_create\",\"id\":\"${RANDOM}\",\"mass\":1,\"size\":[1,1,1],\"pos\":[0,0,20]}
 {\"command\":\"body_create\",\"id\":\"${RANDOM}\",\"mass\":1,\"size\":[1,1,1],\"pos\":[0,0,21]}
