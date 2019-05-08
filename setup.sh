@@ -35,6 +35,7 @@ elif [[ "$1" == "restore" ]];then shift
   ec2 delete ${ec2_host}
   sudo umount ${self_dir}/project
   rm -rf project
+  rm -rf project_backup
   git reset --hard HEAD
 
 elif [[ "$1" == "scp" ]];then shift
