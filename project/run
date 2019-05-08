@@ -29,7 +29,11 @@ elif [ "$1" = "base" ];then shift
   | socat - TCP:localhost:9999
 
 elif [ "$1" = "body_create" ];then shift
-  id="$1"; shift
+  if [[ "$#" -ge 1 ]];then
+    id="$1"; shift
+  else
+    : ${id:="${RANDOM}"}
+  fi
   jq -M -c -n --arg id "$id" \
     '{
       command:"body_create",
@@ -38,7 +42,8 @@ elif [ "$1" = "body_create" ];then shift
       size:[1,1,1],
       pos:[0,0,10]
     }' \
- | socat - TCP:localhost:9999
+  | socat - TCP:localhost:9999
+  echo "body id:$id"
 
 elif [ "$1" = "body_delete" ];then shift
   id="$1"; shift
@@ -178,5 +183,8 @@ elif [ "$1" = "stack" ];then shift
 {\"command\":\"body_create\",\"id\":\"${RANDOM}\",\"mass\":1,\"size\":[1,1,1],\"pos\":[0,0,28]}
 " \
  | socat - TCP:localhost:9999
+
+else
+  echo "unknown command:$@"
 
 fi

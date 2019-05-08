@@ -31,6 +31,12 @@ elif [[ "$1" == "setup_ec2" ]];then shift
   ${0} ports
   ${0} launch
 
+elif [[ "$1" == "show_ip" ]];then shift
+  ec2 get-ip ${ec2_host}
+
+elif [[ "$1" == "restart_bullet" ]];then shift
+  ec2 ssh ${ec2_host} 'cd /home/ec2-user/cmake_bullet_example/project; docker-compose restart bullet; docker-compose  logs -t --tail=10 -f bullet'
+
 elif [[ "$1" == "restore" ]];then shift
   ec2 delete ${ec2_host}
   sudo umount ${self_dir}/project
