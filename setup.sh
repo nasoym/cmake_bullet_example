@@ -27,7 +27,7 @@ elif [[ "$1" == "create_ec2" ]];then shift
 elif [[ "$1" == "setup_ec2" ]];then shift
   provision_ec2 docker ${ec2_host}
   ${0} scp
-  # ${0} mount
+  ${0} mount
   ${0} ports
   ${0} launch
 
@@ -45,7 +45,6 @@ elif [[ "$1" == "mount" ]];then shift
   mv ${self_dir}/project ${self_dir}/project_backup
   mkdir ${self_dir}/project
   sshfs -o ssh_command='ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no' ec2-user@$(ec2 get-ip ${ec2_host}):/home/ec2-user/cmake_bullet_example/project ${self_dir}/project
-  # -o ssh_command='ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no '
 
 elif [[ "$1" == "launch" ]];then shift
   ec2 ssh ${ec2_host} 'cd /home/ec2-user/cmake_bullet_example/project; docker-compose up -d'
@@ -55,9 +54,6 @@ elif [[ "$1" == "ports" ]];then shift
   ec2 port ${ec2_host} 8080
   ec2 port ${ec2_host} 15672
   ec2 port ${ec2_host} 15674
-
-elif [[ "$1" == "html" ]];then shift
-  ~/sinan/git_repos/socat_cgi_bin/socat_cgi -c ${self_dir}/project/html/
 
 else
   echo "unknown command:$@"
