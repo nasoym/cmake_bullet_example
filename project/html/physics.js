@@ -62,14 +62,13 @@ function init() {
 }
 
 function create_body(data) {
-
   var id = data["id"];
   // var material = new THREE.MeshLambertMaterial({color: 0x55B663});
   var material = new THREE.MeshPhongMaterial({color: 0x55B663});
   var material_color = new THREE.MeshBasicMaterial({color: 0x55B663, wireframe: false});
   var material_wireframe = new THREE.MeshBasicMaterial({color: 0x050603, wireframe: true, wireframeLinewidth:3});
 
-  console.log("create body with id: ", id);
+  console.log("create body with id:", id);
 
   if (data.hasOwnProperty("type")) {
     var type = data["type"];
@@ -117,6 +116,24 @@ function update_body(data) {
 
 function update_bodies(data) {
   var all_ids = [];
+  // console.log("scene");
+  // console.log(scene);
+
+  // for (i in scene.children) {
+  //   var object;
+  //   object = scene.children[i];
+  //   console.log(object);
+  //   if (object instanceof THREE.Object3D) {
+  //     console.log("---",object.id);
+  //   }
+  // }
+  // scene.children.traverse (function (object) {
+  //   if (object instanceof THREE.Object3D) {
+  //     console.log("debug: ",object);
+  //     console.log(object.id);
+  //   }
+  // });
+
   scene.traverse (function (object) {
     if (object instanceof THREE.Mesh) {
       all_ids.push(object.parent.id);
@@ -147,7 +164,54 @@ function setup_update_listener(address,exchange_name) {
     });
   };
   var on_error =  function() {
-    console.log('error');
+    console.log('error: ', exchange_name);
+  };
+  client.connect('guest', 'guest', on_connect, on_error, '/');
+}
+
+function create_debug_body(data) {
+  // var material = new THREE.MeshLambertMaterial({color: 0x55B663});
+  var material_wireframe = new THREE.MeshBasicMaterial({color: 0xefefef, wireframe: true, wireframeLinewidth:3});
+
+  var body = THREE.SceneUtils.createMultiMaterialObject( 
+      new THREE.CubeGeometry( 1, 1, 1 ), 
+      [material_wireframe]
+    );
+  body.debug=true;
+  return body;
+}
+
+function debug_bodies(data) {
+  var id;
+  var body;
+  var debug_body;
+  for (i in data) {
+
+    console.log("debug data: " , data[i]);
+    body = scene.getObjectById(data[i]["id"]);
+    if (typeof body !== "undefined") {
+
+      console.log("found body: ",body);
+      debug_body = create_debug_body(data);
+      console.log("created debug body: ", debug_body);
+      body.add(debug_body);
+    }
+  }
+}
+
+function setup_debug_listener(address,exchange_name) {
+  // Stomp.js boilerplate
+  var client = Stomp.client('ws://' + address + '/ws');
+  client.debug = function(a,b) { };
+
+  console.log("setup debug listener");
+  var on_connect = function(x) {
+    id = client.subscribe("/exchange/"+exchange_name, function(d) {
+      debug_bodies(JSON.parse(d.body));
+    });
+  };
+  var on_error =  function() {
+    console.log('error: ', exchange_name);
   };
   client.connect('guest', 'guest', on_connect, on_error, '/');
 }
@@ -176,6 +240,7 @@ document.onreadystatechange = function () {
     init();
     animate();
     setup_update_listener(host + ":" + port, exchange_name);
+    setup_debug_listener(host + ":" + port, "debug_bodies");
   }
 };
 
