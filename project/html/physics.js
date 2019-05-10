@@ -93,6 +93,7 @@ function create_body(data) {
   // body.userData = { "foo" : "bla" };
   // body.name="foo";
   body.id = id;
+  body.type = "physic_body";
   scene.add( body );
   return body;
 }
@@ -116,27 +117,9 @@ function update_body(data) {
 
 function update_bodies(data) {
   var all_ids = [];
-  // console.log("scene");
-  // console.log(scene);
-
-  // for (i in scene.children) {
-  //   var object;
-  //   object = scene.children[i];
-  //   console.log(object);
-  //   if (object instanceof THREE.Object3D) {
-  //     console.log("---",object.id);
-  //   }
-  // }
-  // scene.children.traverse (function (object) {
-  //   if (object instanceof THREE.Object3D) {
-  //     console.log("debug: ",object);
-  //     console.log(object.id);
-  //   }
-  // });
-
   scene.traverse (function (object) {
-    if (object instanceof THREE.Mesh) {
-      all_ids.push(object.parent.id);
+    if ( ('type' in object) && (object.type === "physic_body" )){
+      all_ids.push(object.id);
     }
   });
   var id;
@@ -174,10 +157,23 @@ function create_debug_body(data) {
   var material_wireframe = new THREE.MeshBasicMaterial({color: 0xefefef, wireframe: true, wireframeLinewidth:3});
 
   var body = THREE.SceneUtils.createMultiMaterialObject( 
-      new THREE.CubeGeometry( 1, 1, 1 ), 
+      new THREE.CubeGeometry( 1.5, 1.5, 1.5 ), 
       [material_wireframe]
     );
-  body.debug=true;
+  body.type="debug_body";
+
+
+  if (data.hasOwnProperty("pos")) {
+    console.log("data has pos: " , data["pos"]);
+    body.position.set(data["pos"][0],data["pos"][1],data["pos"][2]);
+  }
+  if (data.hasOwnProperty("rot")) {
+    body.quaternion.set(data["rot"][0],data["rot"][1],data["rot"][2],data["rot"][3]);
+  }
+  if (data.hasOwnProperty("size")) {
+    body.scale.set(data["size"][0],data["size"][1],data["size"][2]);
+  }
+
   return body;
 }
 
@@ -186,15 +182,14 @@ function debug_bodies(data) {
   var body;
   var debug_body;
   for (i in data) {
-
-    console.log("debug data: " , data[i]);
-    body = scene.getObjectById(data[i]["id"]);
-    if (typeof body !== "undefined") {
-
-      console.log("found body: ",body);
-      debug_body = create_debug_body(data);
-      console.log("created debug body: ", debug_body);
-      body.add(debug_body);
+    debug_body = create_debug_body(data[i]);
+    if (data[i].hasOwnProperty("id")) {
+      body = scene.getObjectById(data[i]["id"]);
+      if (typeof body !== "undefined") {
+        body.add(debug_body);
+      }
+    } else {
+      scene.add( debug_body );
     }
   }
 }
