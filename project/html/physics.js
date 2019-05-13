@@ -45,7 +45,7 @@ function init() {
 
   // controls = new THREE.OrbitControls(camera, renderer.domElement);
 
-  controls = new THREE.TrackballControls( camera );
+  controls = new THREE.TrackballControls(camera , render.domElement);
   controls.rotateSpeed = 1.0;
   controls.zoomSpeed = 1.2;
   controls.panSpeed = 0.8;
@@ -90,16 +90,14 @@ function create_body(data) {
     // } else if (type === "sphere" ) {
     }
   }
-  // body.userData = { "foo" : "bla" };
-  // body.name="foo";
-  body.id = id;
-  body.type = "physic_body";
+  body.bullet_id = id;
+  body.bullet_type = "physic_body";
   scene.add( body );
   return body;
 }
 
 function update_body(data) {
-  var body = scene.getObjectById(data["id"]);
+  var body = scene.getObjectByProperty("bullet_id", data["id"]);
   if (typeof body === "undefined") {
     body = create_body(data);
   }
@@ -118,8 +116,8 @@ function update_body(data) {
 function update_bodies(data) {
   var all_ids = [];
   scene.traverse (function (object) {
-    if ( ('type' in object) && (object.type === "physic_body" )){
-      all_ids.push(object.id);
+    if ( ('bullet_type' in object) && (object.bullet_type === "physic_body" )){
+      all_ids.push(object.bullet_id);
     }
   });
   var id;
@@ -132,7 +130,7 @@ function update_bodies(data) {
   // console.log("unused ids: ",all_ids);
   for (i in all_ids) {
     console.log("remove : ",all_ids[i]);
-    scene.remove(scene.getObjectById(all_ids[i]));
+    scene.remove(scene.getObjectByProperty("bullet_id", all_ids[i]));
   }
 }
 
@@ -160,7 +158,7 @@ function create_debug_body(data) {
       new THREE.CubeGeometry( 1.5, 1.5, 1.5 ), 
       [material_wireframe]
     );
-  body.type="debug_body";
+  body.bullet_type="debug_body";
 
 
   if (data.hasOwnProperty("pos")) {
@@ -184,7 +182,7 @@ function debug_bodies(data) {
   for (i in data) {
     debug_body = create_debug_body(data[i]);
     if (data[i].hasOwnProperty("id")) {
-      body = scene.getObjectById(data[i]["id"]);
+      body = scene.getObjectByProperty("bullet_id", data[i]["id"]);
       if (typeof body !== "undefined") {
         body.add(debug_body);
       }
