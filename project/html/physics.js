@@ -110,11 +110,12 @@ function printAt( context , text, x, y, lineHeight, fitWidth)
 
 
   function addTexture(text) {
-    // var text = 'cats'
     //create image
     var bitmap = createRetinaCanvas(100, 100);
     var ctx = bitmap.getContext('2d', {antialias: false});
     ctx.font = 'Bold 20px Arial';
+
+    // ctx.globalAlpha= 0;
 
     ctx.beginPath();
     ctx.rect(0, 0, 100, 100);
@@ -125,6 +126,7 @@ function printAt( context , text, x, y, lineHeight, fitWidth)
     // ctx.textBaseline = "middle";
 
 
+    ctx.globalAlpha= 1;
     ctx.fillStyle = 'white';
     // ctx.fillText(text, 0, 20);
     // ctx.fillText(text, 0, 50);
@@ -148,12 +150,34 @@ function printAt( context , text, x, y, lineHeight, fitWidth)
 function create_body(data) {
   var id = data["id"];
   // var material = new THREE.MeshLambertMaterial({color: 0x55B663});
-  var material = new THREE.MeshPhongMaterial({color: 0x55B663});
+  var color = 0x55B663;
+  if ( (data.hasOwnProperty("json")) && (data["json"].hasOwnProperty("color")) ){
+    color = data["json"]["color"];
+  }
+  // var material = new THREE.MeshPhongMaterial({color: 0x55B663});
+  var material = new THREE.MeshPhongMaterial({color: color});
   var material_color = new THREE.MeshBasicMaterial({color: 0x55B663, wireframe: false});
   var material_wireframe = new THREE.MeshBasicMaterial({color: 0x050603, wireframe: true, wireframeLinewidth:3});
-  var material_text = new THREE.MeshBasicMaterial({ map: addTexture(">" + id + " abcdefghijk dkdkdkd 123.") });
 
-  console.log("create body with id:", id);
+  var material_array = [];
+  if ( (data.hasOwnProperty("json")) && (data["json"].hasOwnProperty("text")) ){
+    var material_text = new THREE.MeshBasicMaterial({ map: addTexture(data["json"]["text"]) });
+    material_array = [material,material,material_text,material_text,material,material];
+
+// var materials = [
+//     leftSide,        // Left side
+//     rightSide,       // Right side
+//     topSide,         // Top side
+//     bottomSide,      // Bottom side
+//     frontSide,       // Front side
+//     backSide         // Back side
+// ];
+
+  } else {
+    material_array = [material,material,material,material,material,material];
+  }
+
+  console.log("create body with id:", id , " data: ", data);
 
   if (data.hasOwnProperty("type")) {
     var type = data["type"];
@@ -161,9 +185,9 @@ function create_body(data) {
       console.log("create box");
       body = THREE.SceneUtils.createMultiMaterialObject( 
           new THREE.CubeGeometry( 1, 1, 1 ), 
-          [material,material_wireframe,material_text]
+          [material_array,material_wireframe]
         );
-          // [material_color,material_wireframe]
+
     } else if (type === "plane" ) {
       console.log("create plane");
       // 2nd and 3rd argument are the vertical / horizontal segments

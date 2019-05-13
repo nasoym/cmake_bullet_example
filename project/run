@@ -40,7 +40,8 @@ elif [ "$1" = "body_create" ];then shift
       id:$id,
       mass:1,
       size:[1,1,1],
-      pos:[0,0,10]
+      pos:[0,0,10],
+      json:{text:"fff bla bla",color:"rgb(255,125,0)"}
     }' \
   | socat - TCP:localhost:9999
   echo "body id:$id"

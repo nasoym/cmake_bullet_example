@@ -90,16 +90,18 @@ int main(int argc, char** argv)
   deque<string> line_deque;
 
   json json_line;
-  auto start = std::chrono::high_resolution_clock::now();
-  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-  auto elapsed = std::chrono::high_resolution_clock::now() - start;
-  long long microseconds = std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
-  float elapsed_seconds = microseconds / (1000.0f * 1000.0f);
-  std::cerr << "elapsed: " <<  microseconds << std::endl;
-  std::cerr << "elapsed: " <<  elapsed_seconds << std::endl;
+  // auto start = std::chrono::high_resolution_clock::now();
+  // std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  // auto elapsed = std::chrono::high_resolution_clock::now() - start;
+  // long long microseconds = std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
+  // float elapsed_seconds = microseconds / (1000.0f * 1000.0f);
+  //
+  // std::cerr << "elapsed: " <<  microseconds << std::endl;
+  // std::cerr << "elapsed: " <<  elapsed_seconds << std::endl;
 
   auto sim_time = std::chrono::high_resolution_clock::now();
 
+  std::cerr << "starting simulation" << std::endl;
   while(1) {
 
     poll_return = poll(&fds, 1, 0);
@@ -419,6 +421,18 @@ int main(int argc, char** argv)
                 it->second.second["size"][1].get<float>(),
                 it->second.second["size"][2].get<float>()
                 );
+            if (it->second.second.find("text") != it->second.second.end()) {
+              printf(
+                ",\"text\":\"%s\"",
+                it->second.second["text"].get<string>().c_str()
+                );
+            }
+            if (it->second.second.find("json") != it->second.second.end()) {
+              printf(
+                ",\"json\":%s",
+                it->second.second["json"].dump().c_str()
+                );
+            }
             // printf(
             //     ",json:%s", 
             //     it->second.second.dump().c_str()
