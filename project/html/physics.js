@@ -20,6 +20,7 @@ function init() {
   renderer.setSize(WIDTH, HEIGHT);
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
+  // renderer.shadowMap.type = THREE.BasicShadowMap;
 
   document.body.appendChild(renderer.domElement);
 
@@ -54,6 +55,12 @@ function init() {
   light.shadow.mapSize.height = 512 * 4; // default
   light.shadow.camera.near = 0.5;    // default
   light.shadow.camera.far = 500;     // default
+
+  light.shadow.camera.right = 35;
+  light.shadow.camera.left = - 35;
+  light.shadow.camera.top	= 35;
+  light.shadow.camera.bottom = - 35;
+  
   scene.add(light);
 
   var ambient_light = new THREE.AmbientLight(0xffffff, 0.5);
@@ -61,6 +68,7 @@ function init() {
 
 
   //Create a helper for the shadow camera (optional)
+
   // var helper = new THREE.CameraHelper( light.shadow.camera );
   // scene.add( helper );
 
@@ -217,7 +225,15 @@ function create_body(data) {
       //   );
       body = new THREE.Mesh(geometry, material_array);
           // [material_array,material_wireframe]
-      body.castShadow = true;
+      if ( 
+          (data.hasOwnProperty("json")) && 
+          (data["json"].hasOwnProperty("cast")) && 
+          (data["json"]["cast"] == 1)
+        ){
+        body.castShadow = false;
+      } else {
+        body.castShadow = true;
+      }
       body.receiveShadow = true;
 
     } else if (type === "plane" ) {
