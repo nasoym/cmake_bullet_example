@@ -10,24 +10,62 @@ function animate() {
 function render() {
   renderer.render( scene, camera );
 }
+// var rightmousemove;
+// document.addEventListener("mousedown", function(event){
+//       rightmousemove = false;
+//       if(event.button == 2){
+//         rightmousemove = true;
+//         return false;
+//       //   // Right click
+//       } 
+//     });
+//     document.addEventListener("mousemove", function(event){
+//       // if(rightmousemove === true){
+//       	// Use stopImmediatePropagation to stop the other handeller from trigerring 
+//         // event.stopImmediatePropagation();
+//       // }
+//     });
 
+
+var clicked_body_id = null;
 function onDocumentMouseClick( event ) {
     event.preventDefault();
+    // event.stopImmediatePropagation();
     mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
     mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
     raycaster.setFromCamera( mouse, camera );
     var intersects = raycaster.intersectObjects( scene.children );
+    clicked_body_id = null;
     if ( intersects.length > 0 ) {
       var object = intersects[ 0 ].object;
-      // object.layers.toggle( BLOOM_SCENE );
-
       if ( ('bullet_type' in object) && (object.bullet_type === "physic_body" )){
         console.log("clicked object: ", object.bullet_id);
+        clicked_body_id = object.bullet_id;
       }
-
-      // render();
     }
   }
+function onDocumentMouseMove( event ) {
+  if (clicked_body_id == null) {
+    // console.log("mouse move none");
+  } else {
+    // console.log("mouse move id: ", clicked_body_id);
+  }
+  // console.log("event.button: " , event.button);
+}
+function onDocumentMouseDown( event ) {
+  console.log("mouse down");
+  // console.log("event.button: " , event.button);
+      // if(event.button == 2){
+}
+function onDocumentMouseUp( event ) {
+  console.log("mouse up");
+  clicked_body_id = null;
+  // event.preventDefault();
+  // event.stopImmediatePropagation();
+      // if(event.button == 2){
+}
+
+
 
 function init() {
   scene = new THREE.Scene();
@@ -92,9 +130,13 @@ function init() {
 
   // controls = new THREE.OrbitControls(camera, renderer.domElement);
 
+  document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+  window.addEventListener( 'mousedown', onDocumentMouseDown, false );
+  document.addEventListener( 'mouseup', onDocumentMouseUp, false );
+
   controls = new THREE.TrackballControls(camera , renderer.domElement);
-  controls.rotateSpeed = 1.0;
-  controls.zoomSpeed = 1.2;
+  controls.rotateSpeed = 3.0;
+  controls.zoomSpeed = 3.0;
   controls.panSpeed = 0.8;
   controls.noZoom = false;
   controls.noPan = false;
@@ -106,10 +148,11 @@ function init() {
   stats = new Stats();
   document.body.appendChild( stats.dom );
 
-
   raycaster = new THREE.Raycaster();
   mouse = new THREE.Vector2();
-  window.addEventListener( 'click', onDocumentMouseClick, false );
+  // window.addEventListener( 'click', onDocumentMouseClick, false );
+  // document.addEventListener( 'click', onDocumentMouseClick, false );
+  // window.addEventListener( 'dblclick', onDocumentMouseClick, false );
 
 
 }
