@@ -61,12 +61,97 @@ function init() {
 
 }
 
+var PIXEL_RATIO = (function () {
+    var ctx = document.createElement('canvas').getContext('2d'),
+        dpr = window.devicePixelRatio || 1,
+        bsr = ctx.webkitBackingStorePixelRatio ||
+              ctx.mozBackingStorePixelRatio ||
+              ctx.msBackingStorePixelRatio ||
+              ctx.oBackingStorePixelRatio ||
+              ctx.backingStorePixelRatio || 1;
+    return dpr / bsr;
+  })();
+
+
+  createRetinaCanvas = function(w, h, ratio) {
+    if (!ratio) { ratio = PIXEL_RATIO; }
+    var can = document.createElement('canvas');
+    can.width = w * ratio;
+    can.height = h * ratio;
+    can.style.width = w + 'px';
+    can.style.height = h + 'px';
+    can.getContext('2d').setTransform(ratio, 0, 0, ratio, 0, 0);
+    return can;
+  }
+
+function printAt( context , text, x, y, lineHeight, fitWidth)
+{
+    fitWidth = fitWidth || 0;
+    
+    if (fitWidth <= 0)
+    {
+         context.fillText( text, x, y );
+        return;
+    }
+    
+    for (var idx = 1; idx <= text.length; idx++)
+    {
+        var str = text.substr(0, idx);
+        // console.log(str, context.measureText(str).width, fitWidth);
+        if (context.measureText(str).width > fitWidth)
+        {
+            context.fillText( text.substr(0, idx-1), x, y );
+            printAt(context, text.substr(idx-1), x, y + lineHeight, lineHeight,  fitWidth);
+            return;
+        }
+    }
+    context.fillText( text, x, y );
+}
+
+
+  function addTexture(text) {
+    // var text = 'cats'
+    //create image
+    var bitmap = createRetinaCanvas(100, 100);
+    var ctx = bitmap.getContext('2d', {antialias: false});
+    ctx.font = 'Bold 20px Arial';
+
+    ctx.beginPath();
+    ctx.rect(0, 0, 100, 100);
+    ctx.fillStyle = 'green';
+    ctx.fill();
+
+    // ctx.textAlign = "center";
+    // ctx.textBaseline = "middle";
+
+
+    ctx.fillStyle = 'white';
+    // ctx.fillText(text, 0, 20);
+    // ctx.fillText(text, 0, 50);
+    printAt(ctx, text, 0, 20, 20, 100 );
+
+
+    // var metrics = ctx.measureText(text);
+    // console.log("text measure: " , metrics );
+    
+    // ctx.strokeStyle = 'black';
+    // ctx.strokeText(text, 0, 20);
+    // printAt(ctx, text, 0, 20, 20, 100 );
+
+    // canvas contents will be used for a texture
+    var texture = new THREE.Texture(bitmap) 
+    texture.needsUpdate = true;
+    return texture;
+  }
+
+
 function create_body(data) {
   var id = data["id"];
   // var material = new THREE.MeshLambertMaterial({color: 0x55B663});
   var material = new THREE.MeshPhongMaterial({color: 0x55B663});
   var material_color = new THREE.MeshBasicMaterial({color: 0x55B663, wireframe: false});
   var material_wireframe = new THREE.MeshBasicMaterial({color: 0x050603, wireframe: true, wireframeLinewidth:3});
+  var material_text = new THREE.MeshBasicMaterial({ map: addTexture(">" + id + " abcdefghijk dkdkdkd 123.") });
 
   console.log("create body with id:", id);
 
@@ -76,7 +161,7 @@ function create_body(data) {
       console.log("create box");
       body = THREE.SceneUtils.createMultiMaterialObject( 
           new THREE.CubeGeometry( 1, 1, 1 ), 
-          [material,material_wireframe]
+          [material,material_wireframe,material_text]
         );
           // [material_color,material_wireframe]
     } else if (type === "plane" ) {
