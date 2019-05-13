@@ -209,12 +209,12 @@ elif [ "$1" = "set" ];then shift
 elif [ "$1" = "stack" ];then shift
   jq -M -c -n --arg id "${RANDOM}" \
     '
-    {command:"body_create",id:($id+"0"),mass:1,size:[1,1,1],pos:[0,0,20]},
-    {command:"body_create",id:($id+"1"),mass:1,size:[1,1,1],pos:[0,0,21]},
-    {command:"body_create",id:($id+"2"),mass:1,size:[1,1,1],pos:[0,0,22]},
-    {command:"body_create",id:($id+"3"),mass:1,size:[1,1,1],pos:[0,0,23]},
-    {command:"body_create",id:($id+"4"),mass:1,size:[1,1,1],pos:[0,0,24]},
-    {command:"body_create",id:($id+"5"),mass:1,size:[1,1,1],pos:[0,0,25]},
+    {command:"body_create",id:($id+"0"),mass:1,size:[1,1,1],pos:[0,0,20],json:{text:($id+"0")}},
+    {command:"body_create",id:($id+"1"),mass:1,size:[1,1,1],pos:[0,0,21],json:{text:($id+"1")}},
+    {command:"body_create",id:($id+"2"),mass:1,size:[1,1,1],pos:[0,0,22],json:{text:($id+"2")}},
+    {command:"body_create",id:($id+"3"),mass:1,size:[1,1,1],pos:[0,0,23],json:{text:($id+"3")}},
+    {command:"body_create",id:($id+"4"),mass:1,size:[1,1,1],pos:[0,0,24],json:{text:($id+"4")}},
+    {command:"body_create",id:($id+"5"),mass:1,size:[1,1,1],pos:[0,0,25],json:{text:($id+"5")}},
     {command:"body_create",id:($id+"6"),mass:1,size:[1,1,1],pos:[0,0,26]},
     {command:"body_create",id:($id+"7"),mass:1,size:[1,1,1],pos:[0,0,27]},
     {command:"body_create",id:($id+"8"),mass:1,size:[1,1,1],pos:[0,0,28]},

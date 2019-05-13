@@ -66,7 +66,7 @@ function init() {
 
   // controls = new THREE.OrbitControls(camera, renderer.domElement);
 
-  controls = new THREE.TrackballControls(camera , render.domElement);
+  controls = new THREE.TrackballControls(camera , renderer.domElement);
   controls.rotateSpeed = 1.0;
   controls.zoomSpeed = 1.2;
   controls.panSpeed = 0.8;
@@ -130,17 +130,18 @@ function printAt( context , text, x, y, lineHeight, fitWidth)
 }
 
 
-  function addTexture(text) {
+  function addTexture(text,color) {
     //create image
     var bitmap = createRetinaCanvas(100, 100);
     var ctx = bitmap.getContext('2d', {antialias: false});
-    ctx.font = 'Bold 20px Arial';
+    ctx.font = 'Bold 40px Arial';
 
     // ctx.globalAlpha= 0;
 
     ctx.beginPath();
     ctx.rect(0, 0, 100, 100);
-    ctx.fillStyle = 'green';
+    // ctx.fillStyle = 'green';
+    ctx.fillStyle = color;
     ctx.fill();
 
     // ctx.textAlign = "center";
@@ -151,7 +152,7 @@ function printAt( context , text, x, y, lineHeight, fitWidth)
     ctx.fillStyle = 'white';
     // ctx.fillText(text, 0, 20);
     // ctx.fillText(text, 0, 50);
-    printAt(ctx, text, 0, 20, 20, 100 );
+    printAt(ctx, text, 0, 40, 40, 100 );
 
 
     // var metrics = ctx.measureText(text);
@@ -171,7 +172,8 @@ function printAt( context , text, x, y, lineHeight, fitWidth)
 function create_body(data) {
   var id = data["id"];
   // var material = new THREE.MeshLambertMaterial({color: 0x55B663});
-  var color = 0x55B663;
+  // var color = 0x55B663;
+  var color = "rgb(50%,70%,50%)";
   if ( (data.hasOwnProperty("json")) && (data["json"].hasOwnProperty("color")) ){
     color = data["json"]["color"];
   }
@@ -185,7 +187,7 @@ function create_body(data) {
 
   var material_array = [];
   if ( (data.hasOwnProperty("json")) && (data["json"].hasOwnProperty("text")) ){
-    var material_text = new THREE.MeshBasicMaterial({ map: addTexture(data["json"]["text"]) });
+    var material_text = new THREE.MeshStandardMaterial({ map: addTexture(data["json"]["text"],color) });
     material_array = [material,material,material_text,material_text,material,material];
 
 // var materials = [
@@ -201,12 +203,13 @@ function create_body(data) {
     material_array = [material,material,material,material,material,material];
   }
 
-  console.log("create body with id:", id , " data: ", data);
+  // console.log("create body with id:", id , " data: ", data);
+  console.log("create body with id:", id);
 
   if (data.hasOwnProperty("type")) {
     var type = data["type"];
     if (type === "box" ) {
-      console.log("create box");
+      // console.log("create box");
       var geometry = new THREE.CubeGeometry( 1, 1, 1 );
       // body = THREE.SceneUtils.createMultiMaterialObject( 
       //     geometry,
