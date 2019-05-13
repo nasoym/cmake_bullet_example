@@ -140,27 +140,31 @@ function printAt( context , text, x, y, lineHeight, fitWidth)
 
   function addTexture(text,color) {
     //create image
-    var bitmap = createRetinaCanvas(100, 100);
+    var fontsize = 20;
+    var fontcolor = 'white';
+    var bitmap_width = 100;
+    var bitmap_height = 100;
+    var bitmap = createRetinaCanvas(bitmap_width, bitmap_height);
     var ctx = bitmap.getContext('2d', {antialias: false});
-    ctx.font = 'Bold 40px Arial';
+    ctx.font = 'Bold '+fontsize+'px Arial';
 
     // ctx.globalAlpha= 0;
 
     ctx.beginPath();
-    ctx.rect(0, 0, 100, 100);
+    ctx.rect(0, 0, bitmap_width, bitmap_height);
     // ctx.fillStyle = 'green';
     ctx.fillStyle = color;
     ctx.fill();
 
+
     // ctx.textAlign = "center";
     // ctx.textBaseline = "middle";
 
-
     ctx.globalAlpha= 1;
-    ctx.fillStyle = 'white';
+    ctx.fillStyle = fontcolor;
     // ctx.fillText(text, 0, 20);
     // ctx.fillText(text, 0, 50);
-    printAt(ctx, text, 0, 40, 40, 100 );
+    printAt(ctx, text, 0, fontsize, fontsize, bitmap_width );
 
 
     // var metrics = ctx.measureText(text);
