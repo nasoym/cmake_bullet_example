@@ -1,4 +1,4 @@
-var scene, camera, renderer;
+var scene, camera, renderer, raycaster, mouse;
 
 function animate() {
   requestAnimationFrame(animate);
@@ -10,6 +10,24 @@ function animate() {
 function render() {
   renderer.render( scene, camera );
 }
+
+function onDocumentMouseClick( event ) {
+    event.preventDefault();
+    mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+    mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+    raycaster.setFromCamera( mouse, camera );
+    var intersects = raycaster.intersectObjects( scene.children );
+    if ( intersects.length > 0 ) {
+      var object = intersects[ 0 ].object;
+      // object.layers.toggle( BLOOM_SCENE );
+
+      if ( ('bullet_type' in object) && (object.bullet_type === "physic_body" )){
+        console.log("clicked object: ", object.bullet_id);
+      }
+
+      // render();
+    }
+  }
 
 function init() {
   scene = new THREE.Scene();
@@ -87,6 +105,12 @@ function init() {
 
   stats = new Stats();
   document.body.appendChild( stats.dom );
+
+
+  raycaster = new THREE.Raycaster();
+  mouse = new THREE.Vector2();
+  window.addEventListener( 'click', onDocumentMouseClick, false );
+
 
 }
 
