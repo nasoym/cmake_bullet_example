@@ -18,6 +18,9 @@ function init() {
 
   renderer = new THREE.WebGLRenderer({antialias:true});
   renderer.setSize(WIDTH, HEIGHT);
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
+
   document.body.appendChild(renderer.domElement);
 
   camera = new THREE.PerspectiveCamera(45, WIDTH / HEIGHT, 0.1, 20000);
@@ -37,11 +40,29 @@ function init() {
     camera.updateProjectionMatrix();
   });
 
-  renderer.setClearColor(new THREE.Color(0x333F47, 1));
+  // renderer.setClearColor(new THREE.Color(0x333F47, 1));
+  // renderer.setClearColor(new THREE.Color("rgb(50%,50%,50%)", 1));
+  // renderer.setClearColor(0xffffff);
+  renderer.setClearColor(0x888888,1);
 
-  var light = new THREE.PointLight(0xffffff);
-  light.position.set(100,100,100);
+  var light = new THREE.DirectionalLight( 0xffffff, 1, 100 );
+  light.position.set( 50, 0, 80 ); 			//default; light shining from top
+  light.target.position.set(0, 0, 0);
+  light.castShadow = true;            // default false
+  //Set up shadow properties for the light
+  light.shadow.mapSize.width = 512 * 4;  // default
+  light.shadow.mapSize.height = 512 * 4; // default
+  light.shadow.camera.near = 0.5;    // default
+  light.shadow.camera.far = 500;     // default
   scene.add(light);
+
+  var ambient_light = new THREE.AmbientLight(0xffffff, 0.5);
+  scene.add(ambient_light);
+
+
+  //Create a helper for the shadow camera (optional)
+  // var helper = new THREE.CameraHelper( light.shadow.camera );
+  // scene.add( helper );
 
   // controls = new THREE.OrbitControls(camera, renderer.domElement);
 
@@ -154,9 +175,12 @@ function create_body(data) {
   if ( (data.hasOwnProperty("json")) && (data["json"].hasOwnProperty("color")) ){
     color = data["json"]["color"];
   }
-  // var material = new THREE.MeshPhongMaterial({color: 0x55B663});
-  var material = new THREE.MeshPhongMaterial({color: color});
-  var material_color = new THREE.MeshBasicMaterial({color: 0x55B663, wireframe: false});
+  // var material = new THREE.MeshPhongMaterial({color: color});
+  // var material = new THREE.MeshLambertMaterial({color: color});
+  var material = new THREE.MeshStandardMaterial({color: color});
+  // var material = new THREE.MeshBasicMaterial({color: color});
+
+  // var material_color = new THREE.MeshBasicMaterial({color: 0x55B663, wireframe: false});
   var material_wireframe = new THREE.MeshBasicMaterial({color: 0x050603, wireframe: true, wireframeLinewidth:3});
 
   var material_array = [];
@@ -183,10 +207,15 @@ function create_body(data) {
     var type = data["type"];
     if (type === "box" ) {
       console.log("create box");
-      body = THREE.SceneUtils.createMultiMaterialObject( 
-          new THREE.CubeGeometry( 1, 1, 1 ), 
-          [material_array,material_wireframe]
-        );
+      var geometry = new THREE.CubeGeometry( 1, 1, 1 );
+      // body = THREE.SceneUtils.createMultiMaterialObject( 
+      //     geometry,
+      //     [material]
+      //   );
+      body = new THREE.Mesh(geometry, material_array);
+          // [material_array,material_wireframe]
+      body.castShadow = true;
+      body.receiveShadow = true;
 
     } else if (type === "plane" ) {
       console.log("create plane");
