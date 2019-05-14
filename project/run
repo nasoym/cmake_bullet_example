@@ -24,7 +24,7 @@ elif [ "$1" = "base" ];then shift
       id:$id,
       mass:0,
       size:[200,200,10],
-      pos:[0,0,-10],
+      pos:[0,0,-5],
       json:{color:"rgb(155,155,155)",castShadow:false,receiveShadow:true}
     }' \
   | socat - TCP:localhost:9999

@@ -43,12 +43,16 @@ function init() {
 
   document.body.appendChild(renderer.domElement);
 
-  camera = new THREE.PerspectiveCamera(45, WIDTH / HEIGHT, 0.1, 20000);
+  // camera = new THREE.PerspectiveCamera(45, WIDTH / HEIGHT, 0.1, 20000);
+  camera = new THREE.PerspectiveCamera(80, WIDTH / HEIGHT, 0.1, 20000);
+// PerspectiveCamera( fov : Number, aspect : Number, near : Number, far : Number )
+
   // camera.rotateOnAxis(new THREE.Vector3(1, 0, 0), degInRad(90));
   // camera.rotation.order = 'YXZ';
-  camera.position.set(0,-20,15);
+  camera.position.set(0,-13,5);
+  // camera.quaternion.set(0.5661364326251805, 0, 0, 0.8243115549684078);
   camera.up = new THREE.Vector3(0,0,1);
-  camera.lookAt(new THREE.Vector3(0,0,0));
+  // camera.lookAt(new THREE.Vector3(0,0,100));
   scene.add(camera);
 
   // Create an event listener that resizes the renderer with the browser window.
@@ -99,6 +103,21 @@ function init() {
   controls.dynamicDampingFactor = 0.3;
   controls.keys = [ 65, 83, 68 ];
   controls.addEventListener( 'change', render );
+
+  controls.update();
+
+  // controls.position0.set(0,-13,1);
+  // controls.target.set( 0.37199768267254957, 0.45912492203464766, 6.88595192741012 );
+  //controls.target.set( 0.37199768267254957, 0.45912492203464766, 16.88595192741012 );
+  camera.position.set(0,-13,5);
+  controls.target.set(0,0,5);
+
+    // controls.target.set(-0.187987644741191, -0.4809028658579914, 1.1054051699184215);
+  controls.update();
+
+  console.log("controls: ", controls);
+
+
 
   stats = new Stats();
   document.body.appendChild( stats.dom );

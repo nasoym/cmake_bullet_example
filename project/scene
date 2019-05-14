@@ -17,48 +17,81 @@ if [[ "$#" -eq 0 ]];then
 elif [[ "$1" == "help" ]];then shift
   which bash_scripts >/dev/null && bash_scripts show_commands ${0}
 
-elif [ "$1" = "base" ];then shift
+elif [ "$1" = "messages_2" ];then shift
 
-elif [ "$1" = "messages" ];then shift
-  for i in {1..30}; do
-    jq -M -c -n --arg id "${RANDOM}${i}" \
-      '{
-        command:"body_create", id:$id, mass:1,
-        size:[4,4,0.5], pos:[0,0,30],
-        json:{text:("SG: abc def ghi "+$id),color:"#88f",fontcolor:"#408",fontsize:15,centerText:false}
-      }' \
-    | socat - TCP:localhost:9999
-    jq -M -c -n --arg id "${RANDOM}${i}" \
-      '{
-        command:"body_create", id:$id, mass:1,
-        size:[4,4,0.5], pos:[10,0,30],
-        json:{text:("SG: abc def ghi "+$id),color:"#f8f",fontcolor:"#408",fontsize:15,centerText:false}
-      }' \
-    | socat - TCP:localhost:9999
-    jq -M -c -n --arg id "${RANDOM}${i}" \
-      '{
-        command:"body_create", id:$id, mass:1,
-        size:[4,4,0.5], pos:[10,10,30],
-        json:{text:("SG: abc def ghi "+$id),color:"#8ff",fontcolor:"#408",fontsize:15,centerText:false}
-      }' \
-    | socat - TCP:localhost:9999
-    jq -M -c -n --arg id "${RANDOM}${i}" \
-      '{
-        command:"body_create", id:$id, mass:1,
-        size:[4,4,0.5], pos:[0,10,30],
-        json:{text:("SG: abc def ghi "+$id),color:"#8f8",fontcolor:"#408",fontsize:15,centerText:false}
-      }' \
-    | socat - TCP:localhost:9999
+  # echo -n "" > ~/Downloads/slack_ids.txt
 
-      sleep 0.1
+# .slack_cache: tail -n 2000 messages_enriched | sed -n '/^{/p' 
+# | jq -r -s -c 'map(select((.type=="message") and (.raw.user_name!=null))|{id:(.raw.channel+.raw.event_ts),channel:.channel_name,text:"\(.raw.user_name): \(.raw.text[0:50]//"")"})[]'
+#     | jq -r -s -c 'map(select((.type=="message") and (.raw.user_name!=null))|"\(.raw.user_name): \(.raw.text[0:40]//"")")[]' \
 
-  done
+  tail -n 8000 /Users/sinangoo/.slack_cache/messages_enriched \
+    | sed -n '/^{/p' \
+    | jq -r -s -c 'map(select((.type=="message") and (.raw.user_name!=null))|{id:(.raw.channel+"-"+.raw.event_ts),channel:.channel_name,text:("\(.raw.user_name): \(.raw.text[0:50]//"")"|gsub("[^a-zA-Z0-9-_ ,:;]";""))})[]' \
+    | while read line; do
+
+      jq -r '.id' <<<"${line}" >> ~/Downloads/slack_ids.txt
+      channel="$(( $RANDOM % 5 ))"
+
+      if [[ "${channel}" == 0 ]];then
+        jq -M -c \
+          '{
+            command:"body_create", id:(.id), mass:1,
+            size:[4,4,0.5], pos:[-12,0,30],
+            json:{text:(.text),color:"#88f",fontcolor:"#408",fontsize:15,centerText:false}
+          }' <<<"${line}" \
+        | socat - TCP:localhost:9999
+      elif [[ "${channel}" == 1 ]];then
+        jq -M -c \
+          '{
+            command:"body_create", id:(.id), mass:1,
+            size:[4,4,0.5], pos:[-6,0,30],
+            json:{text:(.text),color:"#f88",fontcolor:"#408",fontsize:15,centerText:false}
+          }' <<<"${line}" \
+        | socat - TCP:localhost:9999
+      elif [[ "${channel}" == 2 ]];then
+        jq -M -c \
+          '{
+            command:"body_create", id:(.id), mass:1,
+            size:[4,4,0.5], pos:[0,0,30],
+            json:{text:(.text),color:"#8ff",fontcolor:"#408",fontsize:15,centerText:false}
+          }' <<<"${line}" \
+        | socat - TCP:localhost:9999
+      elif [[ "${channel}" == 3 ]];then
+        jq -M -c \
+          '{
+            command:"body_create", id:(.id), mass:1,
+            size:[4,4,0.5], pos:[6,0,30],
+            json:{text:(.text),color:"#f8f",fontcolor:"#408",fontsize:15,centerText:false}
+          }' <<<"${line}" \
+        | socat - TCP:localhost:9999
+      elif [[ "${channel}" == 4 ]];then
+        jq -M -c \
+          '{
+            command:"body_create", id:(.id), mass:1,
+            size:[4,4,0.5], pos:[12,0,30],
+            json:{text:(.text),color:"#ff4",fontcolor:"#408",fontsize:15,centerText:false}
+          }' <<<"${line}" \
+        | socat - TCP:localhost:9999
+      fi
+
+      if [[ $(cat ~/Downloads/slack_ids.txt | wc -l) -ge 100 ]];then
+        jq -M -c -n --arg id "$(sed -n '1p' ~/Downloads/slack_ids.txt)" \
+          '{command:"body_delete", id:$id}' \
+          | socat - TCP:localhost:9999
+        sed -i'' '1d' ~/Downloads/slack_ids.txt 
+      fi
+
+      #sleep 0.1
+
+    done
+
 
 elif [ "$1" = "channels" ];then shift
   jq -M -c -n --arg id "${RANDOM}" \
     '{
       command:"body_create", id:$id, mass:1,
-      size:[5,5,1], pos:[0,0,10],
+      size:[5,5,1], pos:[-12,0,10],
       json:{text:"#mp_operations",color:"#eef",fontcolor:"#408",fontsize:30,centerText:true,textSide:3}
     }' \
   | socat - TCP:localhost:9999
@@ -66,7 +99,7 @@ elif [ "$1" = "channels" ];then shift
   jq -M -c -n --arg id "${RANDOM}" \
     '{
       command:"body_create", id:$id, mass:1,
-      size:[5,5,1], pos:[10,0,10],
+      size:[5,5,1], pos:[-6,0,10],
       json:{text:"#mp_development",color:"#eef",fontcolor:"#408",fontsize:30,centerText:true,textSide:3}
     }' \
   | socat - TCP:localhost:9999
@@ -74,7 +107,7 @@ elif [ "$1" = "channels" ];then shift
   jq -M -c -n --arg id "${RANDOM}" \
     '{
       command:"body_create", id:$id, mass:1,
-      size:[5,5,1], pos:[0,10,10],
+      size:[5,5,1], pos:[0,0,10],
       json:{text:"#mp_smalltalk",color:"#eef",fontcolor:"#408",fontsize:30,centerText:true,textSide:3}
     }' \
   | socat - TCP:localhost:9999
@@ -82,7 +115,15 @@ elif [ "$1" = "channels" ];then shift
   jq -M -c -n --arg id "${RANDOM}" \
     '{
       command:"body_create", id:$id, mass:1,
-      size:[5,5,1], pos:[10,10,10],
+      size:[5,5,1], pos:[6,0,10],
+      json:{text:"#mp_bla",color:"#eef",fontcolor:"#408",fontsize:30,centerText:true,textSide:3}
+    }' \
+  | socat - TCP:localhost:9999
+    
+  jq -M -c -n --arg id "${RANDOM}" \
+    '{
+      command:"body_create", id:$id, mass:1,
+      size:[5,5,1], pos:[12,0,10],
       json:{text:"#mp_bla",color:"#eef",fontcolor:"#408",fontsize:30,centerText:true,textSide:3}
     }' \
   | socat - TCP:localhost:9999
