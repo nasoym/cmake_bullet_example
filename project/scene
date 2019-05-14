@@ -22,9 +22,9 @@ elif [ "$1" = "test" ];then shift
     | sed -n '/^{/p' \
     | jq -r -s -c 'map(select((.type=="message") and (.raw.user_name!=null)))[]' \
     # | jq -r -s -c 'map(select((.type=="message") and (.raw.user_name!=null))|{id:(.raw.channel+"-"+.raw.event_ts),channel:.channel_name,text:("\(.raw.user_name): \(.raw.text[0:50]//"")"|gsub("[^a-zA-Z0-9-_ ,:;]";""))})[]' \
-    # | jq -r -s -c 'map(select((.channel=="mp_operations") or (.channel=="ep_smalltalk") or (.channel=="ep_announcements") or (.channel=="ep_alldev") or  (.channel=="mp_development")))[]' \
+    # | jq -r -s -c 'map(select((.channel=="ep_exploration_day-x") or (.channel=="ep_smalltalk") or (.channel=="ep_announcements") or (.channel=="ep_alldev") or  (.channel=="mp_development")))[]' \
 
-elif [ "$1" = "messages_2" ];then shift
+elif [ "$1" = "messages" ];then shift
 
   # echo -n "" > ~/Downloads/slack_ids.txt
 
@@ -32,17 +32,20 @@ elif [ "$1" = "messages_2" ];then shift
 # | jq -r -s -c 'map(select((.type=="message") and (.raw.user_name!=null))|{id:(.raw.channel+.raw.event_ts),channel:.channel_name,text:"\(.raw.user_name): \(.raw.text[0:50]//"")"})[]'
 #     | jq -r -s -c 'map(select((.type=="message") and (.raw.user_name!=null))|"\(.raw.user_name): \(.raw.text[0:40]//"")")[]' \
 
-  tail -n 30000 /Users/sinangoo/.slack_cache/messages_enriched \
-    | sed -n '/^{/p' \
-    | jq -r -s -c 'map(select((.type=="message") and (.raw.text != null) and (.raw.text != "") and (.raw.user_name!=null))|{id:(.raw.channel+"-"+.raw.event_ts),channel:.channel_name,text:("\(.raw.user_name): \(.time): \(.raw.text[0:150]//"")"|gsub("[^a-zA-Z0-9-_ ,:;]";""))})[]' \
-    | jq -r -s -c 'map(select((.channel=="mp_operations") or (.channel=="ep_smalltalk") or (.channel=="ep_announcements") or (.channel=="ep_alldev") or  (.channel=="mp_development")))[]' \
+  # tail -n 30000 /Users/sinangoo/.slack_cache/messages_enriched \
+  tail -f -n 3000 /Users/sinangoo/.slack_cache/messages_enriched \
+    | sed --unbuffered -n '/^{/p' \
+    | jq -M --unbuffered -r -c --arg rand "${RANDOM}" 'if ((.type=="message") and (.raw.text != null) and (.raw.text != "") and (.raw.user_name!=null)) then {id:(.raw.channel+"-"+.raw.event_ts+$rand),channel:.channel_name,text:("\(.raw.user_name): \(.time): \(.raw.text[0:150]//"")"|gsub("[^a-zA-Z0-9-_ ,:;]";""))} else empty end' \
+    | jq -M --unbuffered -r -c 'if ((.channel=="ep_exploration_day-x") or (.channel=="ep_smalltalk") or (.channel=="ep_announcements") or (.channel=="ep_alldev") or  (.channel=="mp_development")) then . else empty end' \
     | while read line; do
 
       jq -r '.id' <<<"${line}" >> ~/Downloads/slack_ids.txt
       # channel="$(( $RANDOM % 5 ))"
       channel="$(jq -r '.channel' <<<"${line}")"
 
-      if [[ "${channel}" == "mp_operations" ]];then
+      echo "${channel} ---"
+
+      if [[ "${channel}" == "ep_exploration_day-x" ]];then
         jq -M -c \
           '{
             command:"body_create", id:(.id), mass:1,
@@ -101,7 +104,7 @@ elif [ "$1" = "channels" ];then shift
     '{
       command:"body_create", id:$id, mass:1,
       size:[4,4,2], pos:[-10,0,10],
-      json:{text:"#mp_operations",color:"#eef",fontcolor:"#408",fontsize:30,centerText:true,textSide:3}
+      json:{text:"#ep_exploration_day-x",color:"#eef",fontcolor:"#408",fontsize:30,centerText:true,textSide:3}
     }' \
   | socat - TCP:localhost:9999
 
