@@ -1,4 +1,5 @@
-var scene, camera, renderer, raycaster, mouse;
+var scene, camera, renderer, raycaster;
+// var mouse;
 
 function animate() {
   requestAnimationFrame(animate);
@@ -10,61 +11,22 @@ function animate() {
 function render() {
   renderer.render( scene, camera );
 }
-// var rightmousemove;
-// document.addEventListener("mousedown", function(event){
-//       rightmousemove = false;
-//       if(event.button == 2){
-//         rightmousemove = true;
-//         return false;
-//       //   // Right click
-//       } 
-//     });
-//     document.addEventListener("mousemove", function(event){
-//       // if(rightmousemove === true){
-//       	// Use stopImmediatePropagation to stop the other handeller from trigerring 
-//         // event.stopImmediatePropagation();
-//       // }
-//     });
 
-
-var clicked_body_id = null;
 function onDocumentMouseClick( event ) {
-    event.preventDefault();
-    // event.stopImmediatePropagation();
-    mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-    mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-    raycaster.setFromCamera( mouse, camera );
-    var intersects = raycaster.intersectObjects( scene.children );
-    clicked_body_id = null;
-    if ( intersects.length > 0 ) {
-      var object = intersects[ 0 ].object;
-      if ( ('bullet_type' in object) && (object.bullet_type === "physic_body" )){
-        console.log("clicked object: ", object.bullet_id);
-        clicked_body_id = object.bullet_id;
-      }
+  event.preventDefault();
+  var mouse;
+  mouse = new THREE.Vector2();
+  mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+  mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+  raycaster.setFromCamera( mouse, camera );
+  var intersects = raycaster.intersectObjects( scene.children );
+  if ( intersects.length > 0 ) {
+    var object = intersects[ 0 ].object;
+    if ( ('bullet_type' in object) && (object.bullet_type === "physic_body" )){
+      console.log("clicked object: ", object.bullet_id);
     }
   }
-// function onDocumentMouseMove( event ) {
-//   if (clicked_body_id == null) {
-//     // console.log("mouse move none");
-//   } else {
-//     // console.log("mouse move id: ", clicked_body_id);
-//   }
-//   // console.log("event.button: " , event.button);
-// }
-// function onDocumentMouseDown( event ) {
-//   console.log("mouse down");
-//   // console.log("event.button: " , event.button);
-//       // if(event.button == 2){
-// }
-// function onDocumentMouseUp( event ) {
-//   console.log("mouse up");
-//   clicked_body_id = null;
-//   // event.preventDefault();
-//   // event.stopImmediatePropagation();
-//       // if(event.button == 2){
-// }
-
+}
 
 
 function init() {
@@ -75,7 +37,8 @@ function init() {
   renderer = new THREE.WebGLRenderer({antialias:true});
   renderer.setSize(WIDTH, HEIGHT);
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap; 
+  // renderer.shadowMap.type = THREE.PCFShadowMap; // default
   // renderer.shadowMap.type = THREE.BasicShadowMap;
 
   document.body.appendChild(renderer.domElement);
@@ -97,9 +60,6 @@ function init() {
     camera.updateProjectionMatrix();
   });
 
-  // renderer.setClearColor(new THREE.Color(0x333F47, 1));
-  // renderer.setClearColor(new THREE.Color("rgb(50%,50%,50%)", 1));
-  // renderer.setClearColor(0xffffff);
   renderer.setClearColor(0x888888,1);
 
   var light = new THREE.DirectionalLight( 0xffffff, 1, 100 );
@@ -122,17 +82,12 @@ function init() {
   var ambient_light = new THREE.AmbientLight(0xffffff, 0.8);
   scene.add(ambient_light);
 
-
   //Create a helper for the shadow camera (optional)
 
   // var helper = new THREE.CameraHelper( light.shadow.camera );
   // scene.add( helper );
 
   // controls = new THREE.OrbitControls(camera, renderer.domElement);
-
-  // document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-  // window.addEventListener( 'mousedown', onDocumentMouseDown, false );
-  // document.addEventListener( 'mouseup', onDocumentMouseUp, false );
 
   controls = new THREE.TrackballControls(camera , renderer.domElement);
   controls.rotateSpeed = 1.0;
@@ -147,15 +102,9 @@ function init() {
 
   stats = new Stats();
   document.body.appendChild( stats.dom );
-  //document.getElementById("stats").appendChild( stats.dom );
-
 
   raycaster = new THREE.Raycaster();
-  mouse = new THREE.Vector2();
   window.addEventListener( 'click', onDocumentMouseClick, false );
-  // document.addEventListener( 'click', onDocumentMouseClick, false );
-  // window.addEventListener( 'dblclick', onDocumentMouseClick, false );
-
 
 }
 
@@ -213,20 +162,10 @@ function printAt( context , text, x, y, lineHeight, fitWidth)
     var ctx = bitmap.getContext('2d', {antialias: false});
     ctx.font = 'Bold '+fontsize+'px Arial';
 
-    // ctx.globalAlpha= 0;
-
     ctx.beginPath();
     ctx.rect(0, 0, bitmap_width, bitmap_height);
-    // ctx.fillStyle = 'green';
     ctx.fillStyle = bg_color;
     ctx.fill();
-
-
-    // ctx.textAlign = textAlign;
-    // ctx.textBaseline = "middle";
-    // ctx.rotate( Math.PI / 4 );
-    // ctx.rotate( Math.PI / 2 );
-
 
     ctx.globalAlpha= 1;
     ctx.fillStyle = fontcolor;
@@ -241,9 +180,7 @@ function printAt( context , text, x, y, lineHeight, fitWidth)
     } else {
       ctx.textBaseline = 'top';
       printAt(ctx, text, 0, 0, fontsize, bitmap_width );
-
     }
-
 
     // var metrics = ctx.measureText(text);
     // console.log("text measure: " , metrics );
@@ -261,8 +198,6 @@ function printAt( context , text, x, y, lineHeight, fitWidth)
 
 function create_body(data) {
   var id = data["id"];
-  // var material = new THREE.MeshLambertMaterial({color: 0x55B663});
-  // var color = 0x55B663;
   var bg_color = "rgb(50%,70%,50%)";
   var opacity = 1.0;
   var transparent = false;
@@ -337,29 +272,21 @@ function create_body(data) {
     var material_text = new THREE.MeshStandardMaterial({ map: addTexture(data["json"]["text"],bg_color,fontcolor,fontsize,centerText,bitmap_width* bitmap_pixel_per_unit,bitmap_height* bitmap_pixel_per_unit) });
     material_array[textureSide] = material_text;
 
-
   } else {
     material_array = [material,material,material,material,material,material];
   }
 
-  // console.log("create body with id:", id , " data: ", data);
   console.log("create body with id:", id);
 
   if (data.hasOwnProperty("type")) {
     var type = data["type"];
     if (type === "box" ) {
-      // console.log("create box");
       var geometry = new THREE.CubeGeometry( 1, 1, 1 );
-      // body = THREE.SceneUtils.createMultiMaterialObject( 
-      //     geometry,
-      //     [material]
-      //   );
       if (wireframe) {
         body = new THREE.Mesh(geometry, material_wireframe);
       } else {
         body = new THREE.Mesh(geometry, material_array);
       }
-          // [material_array,material_wireframe]
       var castShadow = true;
       var receiveShadow = true;
       if ( (data.hasOwnProperty("json")) && (data["json"].hasOwnProperty("castShadow")) ){
@@ -371,15 +298,13 @@ function create_body(data) {
       body.castShadow = castShadow;
       body.receiveShadow = receiveShadow;
 
-    } else if (type === "plane" ) {
-      console.log("create plane");
-      // 2nd and 3rd argument are the vertical / horizontal segments
-      body = THREE.SceneUtils.createMultiMaterialObject( 
-          new THREE.PlaneGeometry( 1, 1 ), 
-          [material,material_wireframe]
-        );
-          // [material_color,material_wireframe]
-    // } else if (type === "sphere" ) {
+    // } else if (type === "plane" ) {
+    //   console.log("create plane");
+    //   // 2nd and 3rd argument are the vertical / horizontal segments
+    //   body = THREE.SceneUtils.createMultiMaterialObject( 
+    //       new THREE.PlaneGeometry( 1, 1 ), 
+    //       [material,material_wireframe]
+    //     );
     }
   }
   body.bullet_id = id;
@@ -397,7 +322,6 @@ function update_body(data) {
     body.position.set(data["pos"][0],data["pos"][1],data["pos"][2]);
   }
   if (data.hasOwnProperty("rot")) {
-    // console.log(data["rot"][0],data["rot"][1],data["rot"][2],data["rot"][3]);
     body.quaternion.set(data["rot"][0],data["rot"][1],data["rot"][2],data["rot"][3]);
   }
   if (data.hasOwnProperty("size")) {
