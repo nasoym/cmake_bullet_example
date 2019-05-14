@@ -5,7 +5,7 @@ function animate() {
   requestAnimationFrame(animate);
   renderer.render(scene, camera);
   controls.update();
-  stats.update();
+  // stats.update();
 }
 
 function render() {
@@ -119,8 +119,8 @@ function init() {
 
 
 
-  stats = new Stats();
-  document.body.appendChild( stats.dom );
+  // stats = new Stats();
+  // document.body.appendChild( stats.dom );
 
   raycaster = new THREE.Raycaster();
   window.addEventListener( 'click', onDocumentMouseClick, false );
