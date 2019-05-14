@@ -135,9 +135,9 @@ function init() {
   document.addEventListener( 'mouseup', onDocumentMouseUp, false );
 
   controls = new THREE.TrackballControls(camera , renderer.domElement);
-  controls.rotateSpeed = 3.0;
+  controls.rotateSpeed = 1.0;
   controls.zoomSpeed = 3.0;
-  controls.panSpeed = 0.8;
+  controls.panSpeed = 1.5;
   controls.noZoom = false;
   controls.noPan = false;
   controls.staticMoving = true;
