@@ -295,6 +295,7 @@ function create_body(data) {
     var bitmap_width = 1.0;
     var bitmap_height = 1.0;
     var bitmap_pixel_per_unit = 64;
+    var textureSide = 3;
     if ( (data["json"].hasOwnProperty("fontcolor")) ){
       fontcolor = data["json"]["fontcolor"];
     }
@@ -304,27 +305,12 @@ function create_body(data) {
     if ( (data["json"].hasOwnProperty("centerText")) ){
       centerText = data["json"]["centerText"];
     }
-    if (data.hasOwnProperty("size")) {
-      bitmap_width *= data["size"][0];
-      bitmap_height *= data["size"][2];
-    }
     if ( (data["json"].hasOwnProperty("pixel_per_unit")) ){
       bitmap_pixel_per_unit = data["json"]["pixel_per_unit"];
     }
-
-    var material_text = new THREE.MeshStandardMaterial({ map: addTexture(data["json"]["text"],bg_color,fontcolor,fontsize,centerText,bitmap_width* bitmap_pixel_per_unit,bitmap_height* bitmap_pixel_per_unit) });
-    if ( (data["json"].hasOwnProperty("textSides")) ){
-      var textSides = data["json"]["textSides"];
-      for (i in textSides) {
-        material_array[textSides[i]] = material_text;
-      }
-    } else {
-      // material_array = [material,material,material_text,material_text,material,material];
-      material_array[3] = material_text;
+    if ( (data["json"].hasOwnProperty("textSide")) ){
+      textureSide = data["json"]["textSide"];
     }
-
-
-
 // var materials = [
 //     leftSide,        // Left side
 //     rightSide,       // Right side
@@ -333,6 +319,22 @@ function create_body(data) {
 //     frontSide,       // Front side
 //     backSide         // Back side
 // ];
+    if (data.hasOwnProperty("size")) {
+      if ((textureSide == 3)||(textureSide == 2)) {
+        bitmap_width *= data["size"][0];
+        bitmap_height *= data["size"][2];
+      } else if ((textureSide == 0)||(textureSide == 1)) {
+        bitmap_width *= data["size"][1];
+        bitmap_height *= data["size"][2];
+      } else if ((textureSide == 4)||(textureSide == 5)) {
+        bitmap_width *= data["size"][0];
+        bitmap_height *= data["size"][1];
+      }
+    }
+
+    var material_text = new THREE.MeshStandardMaterial({ map: addTexture(data["json"]["text"],bg_color,fontcolor,fontsize,centerText,bitmap_width* bitmap_pixel_per_unit,bitmap_height* bitmap_pixel_per_unit) });
+    material_array[textureSide] = material_text;
+
 
   } else {
     material_array = [material,material,material,material,material,material];

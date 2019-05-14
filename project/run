@@ -58,12 +58,13 @@ elif [ "$1" = "body_create_2" ];then shift
       command:"body_create",
       id:$id,
       mass:1,
-      size:[2,1,2],
+      size:[1,2,2],
       pos:[0,0,10],
-      json:{color:"#ff8",opacity:0.2,castShadow:false,receiveShadow:false,wireframe:true}
+      json:{text:"ABC",color:"#e8f",fontcolor:"#408",fontsize:50,centerText:true,textSide:0}
     }' \
   | socat - TCP:localhost:9999
   echo "body id:$id"
+      # json:{color:"#ff8",opacity:0.2,castShadow:false,receiveShadow:false,wireframe:true}
 
 elif [ "$1" = "body_delete" ];then shift
   id="$1"; shift
