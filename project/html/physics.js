@@ -44,26 +44,26 @@ function onDocumentMouseClick( event ) {
       }
     }
   }
-function onDocumentMouseMove( event ) {
-  if (clicked_body_id == null) {
-    // console.log("mouse move none");
-  } else {
-    // console.log("mouse move id: ", clicked_body_id);
-  }
-  // console.log("event.button: " , event.button);
-}
-function onDocumentMouseDown( event ) {
-  console.log("mouse down");
-  // console.log("event.button: " , event.button);
-      // if(event.button == 2){
-}
-function onDocumentMouseUp( event ) {
-  console.log("mouse up");
-  clicked_body_id = null;
-  // event.preventDefault();
-  // event.stopImmediatePropagation();
-      // if(event.button == 2){
-}
+// function onDocumentMouseMove( event ) {
+//   if (clicked_body_id == null) {
+//     // console.log("mouse move none");
+//   } else {
+//     // console.log("mouse move id: ", clicked_body_id);
+//   }
+//   // console.log("event.button: " , event.button);
+// }
+// function onDocumentMouseDown( event ) {
+//   console.log("mouse down");
+//   // console.log("event.button: " , event.button);
+//       // if(event.button == 2){
+// }
+// function onDocumentMouseUp( event ) {
+//   console.log("mouse up");
+//   clicked_body_id = null;
+//   // event.preventDefault();
+//   // event.stopImmediatePropagation();
+//       // if(event.button == 2){
+// }
 
 
 
@@ -130,9 +130,9 @@ function init() {
 
   // controls = new THREE.OrbitControls(camera, renderer.domElement);
 
-  document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-  window.addEventListener( 'mousedown', onDocumentMouseDown, false );
-  document.addEventListener( 'mouseup', onDocumentMouseUp, false );
+  // document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+  // window.addEventListener( 'mousedown', onDocumentMouseDown, false );
+  // document.addEventListener( 'mouseup', onDocumentMouseUp, false );
 
   controls = new THREE.TrackballControls(camera , renderer.domElement);
   controls.rotateSpeed = 1.0;
@@ -147,10 +147,12 @@ function init() {
 
   stats = new Stats();
   document.body.appendChild( stats.dom );
+  //document.getElementById("stats").appendChild( stats.dom );
+
 
   raycaster = new THREE.Raycaster();
   mouse = new THREE.Vector2();
-  // window.addEventListener( 'click', onDocumentMouseClick, false );
+  window.addEventListener( 'click', onDocumentMouseClick, false );
   // document.addEventListener( 'click', onDocumentMouseClick, false );
   // window.addEventListener( 'dblclick', onDocumentMouseClick, false );
 
