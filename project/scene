@@ -1,0 +1,93 @@
+#!/usr/bin/env bash
+set -o errexit  # abort when any commands exits with error
+set -o pipefail # abort when any command in a pipe exits with error
+set -o nounset  # abort when any unset variable is used
+set -o noglob # prevent bash from expanding glob
+set -o errtrace # inherits trap on ERR in function and subshell
+trap 'echo status:$? line:$LINENO line:$BASH_LINENO command:"$BASH_COMMAND" functions:$(printf " %s" ${FUNCNAME[@]:-})' ERR
+if [[ "${trace:=0}" -eq 1 ]];then
+  PS4='${LINENO}: '
+  set -x
+  export trace
+fi
+
+if [[ "$#" -eq 0 ]];then
+  ${0} help
+
+elif [[ "$1" == "help" ]];then shift
+  which bash_scripts >/dev/null && bash_scripts show_commands ${0}
+
+elif [ "$1" = "base" ];then shift
+
+elif [ "$1" = "messages" ];then shift
+  for i in {1..30}; do
+    jq -M -c -n --arg id "${RANDOM}${i}" \
+      '{
+        command:"body_create", id:$id, mass:1,
+        size:[4,4,0.5], pos:[0,0,30],
+        json:{text:("SG: abc def ghi "+$id),color:"#88f",fontcolor:"#408",fontsize:15,centerText:false}
+      }' \
+    | socat - TCP:localhost:9999
+    jq -M -c -n --arg id "${RANDOM}${i}" \
+      '{
+        command:"body_create", id:$id, mass:1,
+        size:[4,4,0.5], pos:[10,0,30],
+        json:{text:("SG: abc def ghi "+$id),color:"#f8f",fontcolor:"#408",fontsize:15,centerText:false}
+      }' \
+    | socat - TCP:localhost:9999
+    jq -M -c -n --arg id "${RANDOM}${i}" \
+      '{
+        command:"body_create", id:$id, mass:1,
+        size:[4,4,0.5], pos:[10,10,30],
+        json:{text:("SG: abc def ghi "+$id),color:"#8ff",fontcolor:"#408",fontsize:15,centerText:false}
+      }' \
+    | socat - TCP:localhost:9999
+    jq -M -c -n --arg id "${RANDOM}${i}" \
+      '{
+        command:"body_create", id:$id, mass:1,
+        size:[4,4,0.5], pos:[0,10,30],
+        json:{text:("SG: abc def ghi "+$id),color:"#8f8",fontcolor:"#408",fontsize:15,centerText:false}
+      }' \
+    | socat - TCP:localhost:9999
+
+      sleep 0.1
+
+  done
+
+elif [ "$1" = "channels" ];then shift
+  jq -M -c -n --arg id "${RANDOM}" \
+    '{
+      command:"body_create", id:$id, mass:1,
+      size:[5,5,1], pos:[0,0,10],
+      json:{text:"#mp_operations",color:"#eef",fontcolor:"#408",fontsize:30,centerText:true,textSide:3}
+    }' \
+  | socat - TCP:localhost:9999
+
+  jq -M -c -n --arg id "${RANDOM}" \
+    '{
+      command:"body_create", id:$id, mass:1,
+      size:[5,5,1], pos:[10,0,10],
+      json:{text:"#mp_development",color:"#eef",fontcolor:"#408",fontsize:30,centerText:true,textSide:3}
+    }' \
+  | socat - TCP:localhost:9999
+
+  jq -M -c -n --arg id "${RANDOM}" \
+    '{
+      command:"body_create", id:$id, mass:1,
+      size:[5,5,1], pos:[0,10,10],
+      json:{text:"#mp_smalltalk",color:"#eef",fontcolor:"#408",fontsize:30,centerText:true,textSide:3}
+    }' \
+  | socat - TCP:localhost:9999
+
+  jq -M -c -n --arg id "${RANDOM}" \
+    '{
+      command:"body_create", id:$id, mass:1,
+      size:[5,5,1], pos:[10,10,10],
+      json:{text:"#mp_bla",color:"#eef",fontcolor:"#408",fontsize:30,centerText:true,textSide:3}
+    }' \
+  | socat - TCP:localhost:9999
+
+else
+  echo "unknown command:$@"
+
+fi

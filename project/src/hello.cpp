@@ -161,6 +161,8 @@ int main(int argc, char** argv)
               btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, myMotionState, colShape, localInertia);
               btRigidBody* body = new btRigidBody(rbInfo);
 
+              body->forceActivationState(DISABLE_DEACTIVATION);
+
               dynamicsWorld->addRigidBody(body);
 
               bodyMapPair.insert(make_pair(json_line["id"].get<string>(),make_pair(body,json_line)));
