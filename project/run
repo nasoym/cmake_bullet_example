@@ -25,7 +25,7 @@ elif [ "$1" = "base" ];then shift
       mass:0,
       size:[200,200,10],
       pos:[0,0,-10],
-      json:{color:"rgb(155,155,155)",cast:1}
+      json:{color:"rgb(155,155,155)",castShadow:false,receiveShadow:true}
     }' \
   | socat - TCP:localhost:9999
 
@@ -40,9 +40,27 @@ elif [ "$1" = "body_create" ];then shift
       command:"body_create",
       id:$id,
       mass:1,
-      size:[1,1,1],
+      size:[2,1,2],
       pos:[0,0,10],
-      json:{text:"fff bla bla",color:"rgb(255,125,0)"}
+      json:{text:"ABC",color:"#e8f",fontcolor:"#408",fontsize:50,centerText:true,pixel_per_unit:256,opacity:0.8}
+    }' \
+  | socat - TCP:localhost:9999
+  echo "body id:$id"
+
+elif [ "$1" = "body_create_2" ];then shift
+  if [[ "$#" -ge 1 ]];then
+    id="$1"; shift
+  else
+    : ${id:="${RANDOM}"}
+  fi
+  jq -M -c -n --arg id "$id" \
+    '{
+      command:"body_create",
+      id:$id,
+      mass:1,
+      size:[2,1,2],
+      pos:[0,0,10],
+      json:{color:"#ff8",opacity:0.2,castShadow:false,receiveShadow:false,wireframe:true}
     }' \
   | socat - TCP:localhost:9999
   echo "body id:$id"

@@ -421,12 +421,6 @@ int main(int argc, char** argv)
                 it->second.second["size"][1].get<float>(),
                 it->second.second["size"][2].get<float>()
                 );
-            if (it->second.second.find("text") != it->second.second.end()) {
-              printf(
-                ",\"text\":\"%s\"",
-                it->second.second["text"].get<string>().c_str()
-                );
-            }
             if (it->second.second.find("json") != it->second.second.end()) {
               printf(
                 ",\"json\":%s",

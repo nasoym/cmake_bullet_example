@@ -83,7 +83,7 @@ function init() {
   camera = new THREE.PerspectiveCamera(45, WIDTH / HEIGHT, 0.1, 20000);
   // camera.rotateOnAxis(new THREE.Vector3(1, 0, 0), degInRad(90));
   // camera.rotation.order = 'YXZ';
-  camera.position.set(30,30,30);
+  camera.position.set(0,-20,15);
   camera.up = new THREE.Vector3(0,0,1);
   camera.lookAt(new THREE.Vector3(0,0,0));
   scene.add(camera);
@@ -103,7 +103,7 @@ function init() {
   renderer.setClearColor(0x888888,1);
 
   var light = new THREE.DirectionalLight( 0xffffff, 1, 100 );
-  light.position.set( 50, 0, 80 ); 			//default; light shining from top
+  light.position.set( 20, -50, 80 ); 			//default; light shining from top
   light.target.position.set(0, 0, 0);
   light.castShadow = true;            // default false
   //Set up shadow properties for the light
@@ -119,7 +119,7 @@ function init() {
   
   scene.add(light);
 
-  var ambient_light = new THREE.AmbientLight(0xffffff, 0.5);
+  var ambient_light = new THREE.AmbientLight(0xffffff, 0.8);
   scene.add(ambient_light);
 
 
@@ -205,12 +205,8 @@ function printAt( context , text, x, y, lineHeight, fitWidth)
 }
 
 
-  function addTexture(text,color) {
+  function addTexture(text,bg_color,fontcolor,fontsize,centerText,bitmap_width,bitmap_height) {
     //create image
-    var fontsize = 20;
-    var fontcolor = 'white';
-    var bitmap_width = 100;
-    var bitmap_height = 100;
     var bitmap = createRetinaCanvas(bitmap_width, bitmap_height);
     var ctx = bitmap.getContext('2d', {antialias: false});
     ctx.font = 'Bold '+fontsize+'px Arial';
@@ -220,18 +216,31 @@ function printAt( context , text, x, y, lineHeight, fitWidth)
     ctx.beginPath();
     ctx.rect(0, 0, bitmap_width, bitmap_height);
     // ctx.fillStyle = 'green';
-    ctx.fillStyle = color;
+    ctx.fillStyle = bg_color;
     ctx.fill();
 
 
-    // ctx.textAlign = "center";
+    // ctx.textAlign = textAlign;
     // ctx.textBaseline = "middle";
+    // ctx.rotate( Math.PI / 4 );
+    // ctx.rotate( Math.PI / 2 );
+
 
     ctx.globalAlpha= 1;
     ctx.fillStyle = fontcolor;
     // ctx.fillText(text, 0, 20);
     // ctx.fillText(text, 0, 50);
-    printAt(ctx, text, 0, fontsize, fontsize, bitmap_width );
+
+    if (centerText) {
+
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      printAt(ctx, text, bitmap_width/2, bitmap_height/2, fontsize, bitmap_width );
+    } else {
+      ctx.textBaseline = 'top';
+      printAt(ctx, text, 0, 0, fontsize, bitmap_width );
+
+    }
 
 
     // var metrics = ctx.measureText(text);
@@ -252,22 +261,69 @@ function create_body(data) {
   var id = data["id"];
   // var material = new THREE.MeshLambertMaterial({color: 0x55B663});
   // var color = 0x55B663;
-  var color = "rgb(50%,70%,50%)";
+  var bg_color = "rgb(50%,70%,50%)";
+  var opacity = 1.0;
+  var transparent = false;
+  var wireframe = false;
   if ( (data.hasOwnProperty("json")) && (data["json"].hasOwnProperty("color")) ){
-    color = data["json"]["color"];
+    bg_color = data["json"]["color"];
   }
-  // var material = new THREE.MeshPhongMaterial({color: color});
-  // var material = new THREE.MeshLambertMaterial({color: color});
-  var material = new THREE.MeshStandardMaterial({color: color});
-  // var material = new THREE.MeshBasicMaterial({color: color});
+  if ( (data.hasOwnProperty("json")) && (data["json"].hasOwnProperty("opacity")) ){
+    opacity = data["json"]["opacity"];
+  }
+  if ( (data.hasOwnProperty("json")) && (data["json"].hasOwnProperty("wireframe")) ){
+    wireframe = data["json"]["wireframe"];
+  }
+  if ( opacity < 1.0 ) {
+    transparent = true;
+  }
+  // var material = new THREE.MeshPhongMaterial({color: bg_color});
+  // var material = new THREE.MeshLambertMaterial({color: bg_color});
+  var material = new THREE.MeshStandardMaterial({color: bg_color, transparent: transparent, opacity: opacity});
+  // var material = new THREE.MeshBasicMaterial({color: bg_color});
 
   // var material_color = new THREE.MeshBasicMaterial({color: 0x55B663, wireframe: false});
-  var material_wireframe = new THREE.MeshBasicMaterial({color: 0x050603, wireframe: true, wireframeLinewidth:3});
+  var material_wireframe = new THREE.MeshBasicMaterial({color: bg_color, wireframe: true, wireframeLinewidth:3, transparent: transparent, opacity: opacity});
 
   var material_array = [];
+  material_array = [material,material,material,material,material,material];
   if ( (data.hasOwnProperty("json")) && (data["json"].hasOwnProperty("text")) ){
-    var material_text = new THREE.MeshStandardMaterial({ map: addTexture(data["json"]["text"],color) });
-    material_array = [material,material,material_text,material_text,material,material];
+
+    var fontcolor = 'white';
+    var fontsize = 20;
+    var centerText = false;
+    var bitmap_width = 1.0;
+    var bitmap_height = 1.0;
+    var bitmap_pixel_per_unit = 64;
+    if ( (data["json"].hasOwnProperty("fontcolor")) ){
+      fontcolor = data["json"]["fontcolor"];
+    }
+    if ( (data["json"].hasOwnProperty("fontsize")) ){
+      fontsize = data["json"]["fontsize"];
+    }
+    if ( (data["json"].hasOwnProperty("centerText")) ){
+      centerText = data["json"]["centerText"];
+    }
+    if (data.hasOwnProperty("size")) {
+      bitmap_width *= data["size"][0];
+      bitmap_height *= data["size"][2];
+    }
+    if ( (data["json"].hasOwnProperty("pixel_per_unit")) ){
+      bitmap_pixel_per_unit = data["json"]["pixel_per_unit"];
+    }
+
+    var material_text = new THREE.MeshStandardMaterial({ map: addTexture(data["json"]["text"],bg_color,fontcolor,fontsize,centerText,bitmap_width* bitmap_pixel_per_unit,bitmap_height* bitmap_pixel_per_unit) });
+    if ( (data["json"].hasOwnProperty("textSides")) ){
+      var textSides = data["json"]["textSides"];
+      for (i in textSides) {
+        material_array[textSides[i]] = material_text;
+      }
+    } else {
+      // material_array = [material,material,material_text,material_text,material,material];
+      material_array[3] = material_text;
+    }
+
+
 
 // var materials = [
 //     leftSide,        // Left side
@@ -294,18 +350,22 @@ function create_body(data) {
       //     geometry,
       //     [material]
       //   );
-      body = new THREE.Mesh(geometry, material_array);
-          // [material_array,material_wireframe]
-      if ( 
-          (data.hasOwnProperty("json")) && 
-          (data["json"].hasOwnProperty("cast")) && 
-          (data["json"]["cast"] == 1)
-        ){
-        body.castShadow = false;
+      if (wireframe) {
+        body = new THREE.Mesh(geometry, material_wireframe);
       } else {
-        body.castShadow = true;
+        body = new THREE.Mesh(geometry, material_array);
       }
-      body.receiveShadow = true;
+          // [material_array,material_wireframe]
+      var castShadow = true;
+      var receiveShadow = true;
+      if ( (data.hasOwnProperty("json")) && (data["json"].hasOwnProperty("castShadow")) ){
+        castShadow = data["json"]["castShadow"];
+      }
+      if ( (data.hasOwnProperty("json")) && (data["json"].hasOwnProperty("receiveShadow")) ){
+        receiveShadow = data["json"]["receiveShadow"];
+      }
+      body.castShadow = castShadow;
+      body.receiveShadow = receiveShadow;
 
     } else if (type === "plane" ) {
       console.log("create plane");
