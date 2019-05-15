@@ -33,7 +33,7 @@ elif [ "$1" = "messages" ];then shift
 #     | jq -r -s -c 'map(select((.type=="message") and (.raw.user_name!=null))|"\(.raw.user_name): \(.raw.text[0:40]//"")")[]' \
 
   # tail -n 30000 /Users/sinangoo/.slack_cache/messages_enriched \
-  tail -f -n 3000 /Users/sinangoo/.slack_cache/messages_enriched \
+  tail -f -n 500 /Users/sinangoo/.slack_cache/messages_enriched \
     | sed --unbuffered -n '/^{/p' \
     | jq -M --unbuffered -r -c --arg rand "${RANDOM}" 'if ((.type=="message") and (.raw.text != null) and (.raw.text != "") and (.raw.user_name!=null)) then {id:(.raw.channel+"-"+.raw.event_ts+$rand),channel:.channel_name,text:("\(.raw.user_name): \(.time): \(.raw.text[0:150]//"")"|gsub("[^a-zA-Z0-9-_ ,:;]";""))} else empty end' \
     | jq -M --unbuffered -r -c 'if ((.channel=="ep_exploration_day-x") or (.channel=="ep_smalltalk") or (.channel=="ep_announcements") or (.channel=="ep_alldev") or  (.channel=="mp_development")) then . else empty end' \
@@ -87,7 +87,7 @@ elif [ "$1" = "messages" ];then shift
         | socat - TCP:localhost:9999
       fi
 
-      if [[ $(cat ~/Downloads/slack_ids.txt | wc -l) -ge 150 ]];then
+      if [[ $(cat ~/Downloads/slack_ids.txt | wc -l) -ge 200 ]];then
         jq -M -c -n --arg id "$(sed -n '1p' ~/Downloads/slack_ids.txt)" \
           '{command:"body_delete", id:$id}' \
           | socat - TCP:localhost:9999

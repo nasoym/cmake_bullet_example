@@ -19,11 +19,11 @@ function onDocumentMouseClick( event ) {
   mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
   mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
   raycaster.setFromCamera( mouse, camera );
-  var intersects = raycaster.intersectObjects( scene.children );
+  var intersects = raycaster.intersectObjects(scene.children , true);
   if ( intersects.length > 0 ) {
     var object = intersects[ 0 ].object;
     if ( ('bullet_type' in object) && (object.bullet_type === "physic_body" )){
-      console.log("clicked object: ", object.bullet_id);
+      console.log("clicked physic object: ", object.bullet_id);
     }
   }
 }
@@ -300,7 +300,15 @@ function create_body(data) {
   if (data.hasOwnProperty("type")) {
     var type = data["type"];
     if (type === "box" ) {
-      var geometry = new THREE.CubeGeometry( 1, 1, 1 );
+      var size_x = 1;
+      var size_y = 1;
+      var size_z = 1;
+      if (data.hasOwnProperty("size")) {
+        size_x = data["size"][0];
+        size_y = data["size"][1];
+        size_z = data["size"][2];
+      }
+      var geometry = new THREE.CubeGeometry(size_x, size_y, size_z);
       if (wireframe) {
         body = new THREE.Mesh(geometry, material_wireframe);
       } else {
@@ -327,8 +335,6 @@ function create_body(data) {
     }
   }
   body.bullet_id = id;
-  body.bullet_type = "physic_body";
-  scene.add( body );
   return body;
 }
 
@@ -336,6 +342,8 @@ function update_body(data) {
   var body = scene.getObjectByProperty("bullet_id", data["id"]);
   if (typeof body === "undefined") {
     body = create_body(data);
+    body.bullet_type = "physic_body";
+    scene.add( body );
   }
   if (data.hasOwnProperty("pos")) {
     body.position.set(data["pos"][0],data["pos"][1],data["pos"][2]);
@@ -343,9 +351,9 @@ function update_body(data) {
   if (data.hasOwnProperty("rot")) {
     body.quaternion.set(data["rot"][0],data["rot"][1],data["rot"][2],data["rot"][3]);
   }
-  if (data.hasOwnProperty("size")) {
-    body.scale.set(data["size"][0],data["size"][1],data["size"][2]);
-  }
+  // if (data.hasOwnProperty("size")) {
+  //   body.scale.set(data["size"][0],data["size"][1],data["size"][2]);
+  // }
 }
 
 function update_bodies(data) {
@@ -385,45 +393,49 @@ function setup_update_listener(address,exchange_name) {
   client.connect('guest', 'guest', on_connect, on_error, '/');
 }
 
-function create_debug_body(data) {
-  // var material = new THREE.MeshLambertMaterial({color: 0x55B663});
-  var material_wireframe = new THREE.MeshBasicMaterial({color: 0xefefef, wireframe: true, wireframeLinewidth:3});
-
-  var body = THREE.SceneUtils.createMultiMaterialObject( 
-      new THREE.CubeGeometry( 1.5, 1.5, 1.5 ), 
-      [material_wireframe]
-    );
-  body.bullet_type="debug_body";
-
-
-  if (data.hasOwnProperty("pos")) {
-    console.log("data has pos: " , data["pos"]);
-    body.position.set(data["pos"][0],data["pos"][1],data["pos"][2]);
-  }
-  if (data.hasOwnProperty("rot")) {
-    body.quaternion.set(data["rot"][0],data["rot"][1],data["rot"][2],data["rot"][3]);
-  }
-  if (data.hasOwnProperty("size")) {
-    body.scale.set(data["size"][0],data["size"][1],data["size"][2]);
-  }
-
-  return body;
-}
-
 function debug_bodies(data) {
-  var id;
-  var body;
-  var debug_body;
-  for (i in data) {
-    debug_body = create_debug_body(data[i]);
-    if (data[i].hasOwnProperty("id")) {
-      body = scene.getObjectByProperty("bullet_id", data[i]["id"]);
-      if (typeof body !== "undefined") {
-        body.add(debug_body);
-      }
-    } else {
-      scene.add( debug_body );
+
+  var all_ids = [];
+  scene.traverse (function (object) {
+    if ( ('bullet_type' in object) && (object.bullet_type === "debug_body" )){
+      all_ids.push(object.bullet_id);
     }
+  });
+  var id;
+  for (i in data) {
+
+    var body = scene.getObjectByProperty("bullet_id", data[i]["id"]);
+    if (typeof body === "undefined") {
+      body = create_body(data[i]);
+      body.bullet_type = "debug_body";
+
+      if (data[i].hasOwnProperty("parentid")) {
+        var parent_body = scene.getObjectByProperty("bullet_id", data[i]["parentid"]);
+        if (typeof parent_body !== "undefined") {
+          parent_body.add(body);
+        }
+      } else {
+        scene.add( body );
+      }
+
+    }
+    if (data[i].hasOwnProperty("pos")) {
+      body.position.set(data[i]["pos"][0],data[i]["pos"][1],data[i]["pos"][2]);
+    }
+    if (data[i].hasOwnProperty("rot")) {
+      body.quaternion.set(data[i]["rot"][0],data[i]["rot"][1],data[i]["rot"][2],data[i]["rot"][3]);
+    }
+
+    id = data[i]["id"];
+    all_ids = all_ids.filter(function(val,i,a) {return val !== id;})
+  }
+
+  // console.log("unused ids: ",all_ids);
+  for (i in all_ids) {
+    console.log("remove : ",all_ids[i]);
+    // scene.remove(scene.getObjectByProperty("bullet_id", all_ids[i]));
+    var object_to_remove = scene.getObjectByProperty("bullet_id", all_ids[i]);
+    object_to_remove.parent.remove(object_to_remove);
   }
 }
 

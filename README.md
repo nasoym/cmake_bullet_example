@@ -10,6 +10,7 @@
   * solve ik target
   * -----
   * change body settings (mass,..)
+  * rabbit message ttl
   * -----
   * handle json array input line
   * exit command
