@@ -5,15 +5,19 @@
   * debug bodies 
     * absolute (transparent)
     * body relative (pos,rot)
-  * show body id on three.js touch
+  * show body id on three.js touch (also for debug bodies)
+  * set body rotation by degree
+  * set body rotation, position
   * -----
   * solve ik target
+  * set body mass
   * -----
   * change body settings (mass,..)
   * rabbit message ttl
   * -----
   * handle json array input line
   * exit command
+  * change body size
   * -----
   * delete collision shape
   * create plane/sphere

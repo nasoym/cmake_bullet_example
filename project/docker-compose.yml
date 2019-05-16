@@ -19,6 +19,13 @@ services:
     volumes:
       - ./html/:/usr/local/apache2/htdocs/ 
 
+  debug_bodies:
+    image: python:3.7-alpine
+    volumes:
+      - ./src:/src
+      - ./debug_bodies:/debug_bodies
+    command: /bin/sh -c 'apk update; apk add jq; pip3 install pika; while true; do jq -c "." /debug_bodies/debug_bodies.json | rabbit_queue="debug_bodies" rabbit_host="rabbit" python3 /src/python_pika_write.py; sleep 0.2; done'
+
   rabbit:
     image: activiti/rabbitmq-stomp
     ports:
