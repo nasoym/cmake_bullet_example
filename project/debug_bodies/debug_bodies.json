@@ -1,20 +1,2 @@
 [
-  {
-    "type": "box",
-    "id": "debug-6",
-    "parentid":"21290",
-    "pos": [0,0,1],
-    "size": [1,1,2],
-    "json":{"color":"#eee","opacity":0.1,"castShadow":false,"receiveShadow":false,"wireframe":true}
-  },
-  {
-    "type": "box",
-    "id": "debug-2",
-    "pos": [1,1,1]
-  },
-  {
-    "type": "box",
-    "id": "debug-22",
-    "pos": [1,1,3]
-  }
 ]

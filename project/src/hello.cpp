@@ -183,6 +183,29 @@ int main(int argc, char** argv)
               body->activate();
             }
           }
+          else if (json_line["command"].get<string>().compare("body_set") == 0) {
+            map<string, pair<btRigidBody*,json>>::iterator it = bodyMapPair.find(json_line["id"].get<string>());
+            if(it != bodyMapPair.end()) {
+              btRigidBody* body = it->second.first;
+
+              btTransform trans;
+              if (body && body->getMotionState()) {
+                body->getMotionState()->getWorldTransform(trans);
+              }
+              if (json_line.find("pos") != json_line.end()) {
+                trans.setOrigin(
+                    btVector3(
+                      json_line["pos"][0].get<float>(),
+                      json_line["pos"][1].get<float>(),
+                      json_line["pos"][2].get<float>()
+                      )
+                    );
+              }
+              btDefaultMotionState* myMotionState = new btDefaultMotionState(trans);
+              body->setMotionState(myMotionState);
+
+            }
+          }
 
           else if (json_line["command"].get<string>().compare("body_delete") == 0) {
             map<string, pair<btRigidBody*,json>>::iterator it = bodyMapPair.find(json_line["id"].get<string>());

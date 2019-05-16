@@ -47,6 +47,16 @@ elif [ "$1" = "body_create" ];then shift
   | socat - TCP:localhost:9999
   echo "body id:$id"
 
+elif [ "$1" = "body_set" ];then shift
+  id="$1"; shift
+  jq -M -c -n --arg id "$id" \
+    '{
+      command:"body_set",
+      id:$id,
+      pos:[0,0,20]
+    }' \
+  | socat - TCP:localhost:9999
+
 elif [ "$1" = "body_create_2" ];then shift
   if [[ "$#" -ge 1 ]];then
     id="$1"; shift

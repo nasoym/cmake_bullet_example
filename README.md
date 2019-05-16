@@ -5,14 +5,14 @@
   * debug bodies 
     * absolute (transparent)
     * body relative (pos,rot)
-  * show body id on three.js touch (also for debug bodies)
   * set body rotation by degree
   * set body rotation, position
   * -----
   * solve ik target
-  * set body mass
   * -----
-  * change body settings (mass,..)
+  * set body mass
+  * show body id on three.js touch (also for debug bodies)
+  * -----
   * rabbit message ttl
   * -----
   * handle json array input line
