@@ -421,7 +421,20 @@ function debug_bodies(data) {
       body.position.set(data[i]["pos"][0],data[i]["pos"][1],data[i]["pos"][2]);
     }
     if (data[i].hasOwnProperty("rot")) {
-      body.quaternion.set(data[i]["rot"][0],data[i]["rot"][1],data[i]["rot"][2],data[i]["rot"][3]);
+      if (data[i]["rot"].length == 3) {
+        body.quaternion.setFromEuler(
+          new THREE.Euler(
+            Math.PI * data[i]["rot"][1] / 180,
+            Math.PI * data[i]["rot"][0] / 180,
+            Math.PI * data[i]["rot"][2] / 180
+          )
+        );
+
+
+      } else if (data[i]["rot"].length == 4) {
+        body.quaternion.set(data[i]["rot"][0],data[i]["rot"][1],data[i]["rot"][2],data[i]["rot"][3]);
+      }
+
     }
 
     id = data[i]["id"];

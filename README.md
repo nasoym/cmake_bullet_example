@@ -2,16 +2,10 @@
 
 
 ## todos
-  * debug bodies 
-    * absolute (transparent)
-    * body relative (pos,rot)
-  * set body rotation by degree
-  * set body rotation, position
-  * -----
+  * show body id on three.js touch (also for debug bodies)
   * solve ik target
   * -----
   * set body mass
-  * show body id on three.js touch (also for debug bodies)
   * -----
   * rabbit message ttl
   * -----

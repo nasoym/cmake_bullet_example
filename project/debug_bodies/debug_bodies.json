@@ -1,2 +1,20 @@
 [
+  {
+    "type": "box",
+    "id": "debug-6",
+    "parentid":"17689",
+    "pos": [0,0,1],
+    "size": [2,1,1],
+    "rot": [0,0,0],
+    "json":{"color":"#eee","opacity":0.1,"castShadow":false,"receiveShadow":false,"wireframe":true}
+  },
+  {
+    "type": "box",
+    "id": "debug-7",
+    "parentid":"25958",
+    "pos": [4,0,1],
+    "size": [2,1,1],
+    "rot": [0,0,0],
+    "json":{"color":"#eee","opacity":0.1,"castShadow":false,"receiveShadow":false,"wireframe":true}
+  }
 ]
