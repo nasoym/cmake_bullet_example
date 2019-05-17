@@ -16,6 +16,8 @@
   * delete collision shape
   * create plane/sphere
 
+https://threejs.org/docs/#examples/controls/OrbitControls
+
 https://stackoverflow.com/questions/12778229/what-does-step-mean-in-stepsimulation-and-what-do-its-parameters-mean-in-bulle
 
 https://stackoverflow.com/questions/45691950/how-to-achieve-maximum-simulation-accuracy-in-bullet
