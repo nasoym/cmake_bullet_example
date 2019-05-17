@@ -44,7 +44,7 @@ function init() {
   document.body.appendChild(renderer.domElement);
 
   // camera = new THREE.PerspectiveCamera(45, WIDTH / HEIGHT, 0.1, 20000);
-  camera = new THREE.PerspectiveCamera(80, WIDTH / HEIGHT, 0.1, 20000);
+  camera = new THREE.PerspectiveCamera(50, WIDTH / HEIGHT, 0.1, 20000);
 // PerspectiveCamera( fov : Number, aspect : Number, near : Number, far : Number )
 
   // camera.rotateOnAxis(new THREE.Vector3(1, 0, 0), degInRad(90));
@@ -94,9 +94,9 @@ function init() {
   // controls = new THREE.OrbitControls(camera, renderer.domElement);
 
   controls = new THREE.TrackballControls(camera , renderer.domElement);
-  controls.rotateSpeed = 1.0;
+  controls.rotateSpeed = 3.0;
   controls.zoomSpeed = 3.0;
-  controls.panSpeed = 1.5;
+  controls.panSpeed = 3.0;
   controls.noZoom = false;
   controls.noPan = false;
   controls.staticMoving = true;
@@ -116,8 +116,6 @@ function init() {
   controls.update();
 
   console.log("controls: ", controls);
-
-
 
   // stats = new Stats();
   // document.body.appendChild( stats.dom );

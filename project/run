@@ -39,9 +39,9 @@ elif [ "$1" = "body_create" ];then shift
     '{
       command:"body_create",
       id:$id,
-      mass:1,
+      mass:0,
       size:[4,1,0.5],
-      pos:[0,0,20],
+      pos:[0,0,5],
       json:{text:"abc def ghi",color:"#88f",fontcolor:"#408",fontsize:20,centerText:false}
     }' \
   | socat - TCP:localhost:9999
@@ -53,7 +53,8 @@ elif [ "$1" = "body_set" ];then shift
     '{
       command:"body_set",
       id:$id,
-      pos:[0,0,20]
+      pos:[0,0,7],
+      rot:[0,0,-80]
     }' \
   | socat - TCP:localhost:9999
 

@@ -201,6 +201,29 @@ int main(int argc, char** argv)
                       )
                     );
               }
+              if (json_line.find("rot") != json_line.end()) {
+
+                if (json_line["rot"].size() == 3 ) {
+                  trans.setRotation(
+                    btQuaternion(
+                      PI * json_line["rot"][0].get<float>() / 180.0,
+                      PI * json_line["rot"][1].get<float>() / 180.0,
+                      PI * json_line["rot"][2].get<float>() / 180.0
+                    ) 
+                    );
+                } 
+                else if (json_line["rot"].size() == 4 ) {
+                  trans.setRotation(
+                    btQuaternion(
+                      json_line["rot"][0].get<float>(),
+                      json_line["rot"][1].get<float>(),
+                      json_line["rot"][2].get<float>(),
+                      json_line["rot"][3].get<float>()
+                    ) 
+                    );
+
+                }
+              }
               btDefaultMotionState* myMotionState = new btDefaultMotionState(trans);
               body->setMotionState(myMotionState);
 
