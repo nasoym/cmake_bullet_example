@@ -28,6 +28,7 @@ const double PI = 3.1415926535897932384626433832795028841972;
   map <string,pair<btRigidBody*,json>> bodyMapPair;
 
   map <string,pair<btGeneric6DofSpring2Constraint*,json>> constraintMapPair;
+	btDiscreteDynamicsWorld* dynamicsWorld;
 
 void clearJointForBody(string bodyId) {
   map<string, pair<btGeneric6DofSpring2Constraint*,json>>::iterator it = constraintMapPair.begin();
@@ -35,8 +36,14 @@ void clearJointForBody(string bodyId) {
   {
     json constraint_json_line = it->second.second;
     if (constraint_json_line["id1"].get<string>().compare(bodyId) == 0) {
+        std::cerr << "clear joint: " << it->first << " which is connected to:" <<  bodyId << std::endl;
+        btGeneric6DofSpring2Constraint* constraint = it->second.first;
+        dynamicsWorld->removeConstraint(constraint);
         constraintMapPair.erase(it);
     } else if (constraint_json_line["id2"].get<string>().compare(bodyId) == 0) {
+        std::cerr << "clear joint: " << it->first << " which is connected to:" <<  bodyId << std::endl;
+        btGeneric6DofSpring2Constraint* constraint = it->second.first;
+        dynamicsWorld->removeConstraint(constraint);
         constraintMapPair.erase(it);
     }
   }
@@ -63,7 +70,7 @@ int main(int argc, char** argv)
 	///the default constraint solver. For parallel processing you can use a different solver (see Extras/BulletMultiThreaded)
 	btSequentialImpulseConstraintSolver* solver = new btSequentialImpulseConstraintSolver;
 
-	btDiscreteDynamicsWorld* dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, collisionConfiguration);
+	dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, collisionConfiguration);
 
 	dynamicsWorld->setGravity(btVector3(0, 0, -10));
 	// dynamicsWorld->getSolverInfo().m_numIterations = 50;  //todo: what value is good?
@@ -165,6 +172,7 @@ int main(int argc, char** argv)
 
               dynamicsWorld->addRigidBody(body);
 
+              std::cerr << "create body: " << json_line["id"].get<string>() << std::endl;
               bodyMapPair.insert(make_pair(json_line["id"].get<string>(),make_pair(body,json_line)));
             }
           }
@@ -253,6 +261,7 @@ int main(int argc, char** argv)
             while(it != bodyMapPair.end())
             {
               btRigidBody* body = it->second.first;
+              std::cerr << "clear body: " << it->first << std::endl;
               clearJointForBody(it->first);
               dynamicsWorld->removeRigidBody(body);
 
@@ -308,6 +317,7 @@ int main(int argc, char** argv)
                 constraint->setLimit(5, 0, 0);
 
                 dynamicsWorld->addConstraint(constraint, true);
+                std::cerr << "create joint: " << json_line["id"].get<string>() << std::endl;
 
                 constraintMapPair.insert(make_pair(json_line["id"].get<string>(),make_pair(constraint,json_line)));
               }

@@ -1,20 +1,11 @@
 [
   {
     "type": "box",
-    "id": "debug-6",
-    "parentid":"17689",
-    "pos": [0,0,1],
+    "id": "debug-6667",
+    "parentid":"13897",
+    "pos": [2,0.5,0],
     "size": [2,1,1],
-    "rot": [0,0,0],
-    "json":{"color":"#eee","opacity":0.1,"castShadow":false,"receiveShadow":false,"wireframe":true}
-  },
-  {
-    "type": "box",
-    "id": "debug-7",
-    "parentid":"25958",
-    "pos": [4,0,1],
-    "size": [2,1,1],
-    "rot": [0,0,0],
+    "rot": [0,0,60],
     "json":{"color":"#eee","opacity":0.1,"castShadow":false,"receiveShadow":false,"wireframe":true}
   }
 ]

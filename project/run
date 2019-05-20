@@ -53,8 +53,8 @@ elif [ "$1" = "body_set" ];then shift
     '{
       command:"body_set",
       id:$id,
-      pos:[0,0,7],
-      rot:[0,0,-80]
+      pos:[0,0,5],
+      rot:[-70,0,0]
     }' \
   | socat - TCP:localhost:9999
 
@@ -137,6 +137,29 @@ elif [ "$1" = "joint_create" ];then shift
     ' \
   | socat - TCP:localhost:9999
   echo "joint:$id body1:$id1 body2:$id2"
+
+elif [ "$1" = "ik_setup" ];then shift
+  jq -M -c -n \
+    '
+      {command:"body_create",id:"root",mass:0,size:[2,2,2],pos:[0,0,15],rot:[0,0,0],json:{color:"#f88"}}
+      ,
+      {command:"body_create",id:"link1",mass:1,size:[1,1,4],pos:[0,0,5],rot:[0,0,0],json:{color:"#8f8"}}
+      ,
+      {command:"body_create",id:"link2",mass:1,size:[1,1,4],pos:[0,0,5],rot:[0,0,0],json:{color:"#88f"}}
+      ,
+      {command:"joint_create",id:"j1",id1:"root",id2:"link1",
+        pos1:[0,0,2],pos2:[0,0,-2],rot1:[0,0,0,1],rot2:[0,0,0,1]}
+      ,
+      {command:"joint_create",id:"j2",id1:"link1",id2:"link2",
+        pos1:[0,0,2],pos2:[0,0,-2],rot1:[0,0,0,1],rot2:[0,0,0,1]}
+      ,
+      {command:"joint_settings",id:"j1",settings:[
+        {index:3,limits:[-1,1]},{index:4,limits:[-1,1]}]}
+      ,
+      {command:"joint_settings",id:"j2",settings:[
+        {index:3,limits:[-1,1]},{index:4,limits:[-1,1]}]}
+    ' \
+  | socat - TCP:localhost:9999
 
 elif [ "$1" = "joint_delete" ];then shift
   id="$1"; shift

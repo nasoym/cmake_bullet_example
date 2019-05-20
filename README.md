@@ -2,9 +2,11 @@
 
 
 ## todos
-  * show body id on three.js touch (also for debug bodies)
+  * delete render shapes
+  * delete joints
   * solve ik target
   * -----
+  * show body id on three.js touch (also for debug bodies)
   * set body mass
   * -----
   * rabbit message ttl

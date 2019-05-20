@@ -404,37 +404,41 @@ function debug_bodies(data) {
 
     var body = scene.getObjectByProperty("bullet_id", data[i]["id"]);
     if (typeof body === "undefined") {
-      body = create_body(data[i]);
-      body.bullet_type = "debug_body";
 
       if (data[i].hasOwnProperty("parentid")) {
         var parent_body = scene.getObjectByProperty("bullet_id", data[i]["parentid"]);
         if (typeof parent_body !== "undefined") {
+          body = create_body(data[i]);
+          body.bullet_type = "debug_body";
           parent_body.add(body);
         }
       } else {
+        body = create_body(data[i]);
+        body.bullet_type = "debug_body";
         scene.add( body );
       }
 
     }
-    if (data[i].hasOwnProperty("pos")) {
-      body.position.set(data[i]["pos"][0],data[i]["pos"][1],data[i]["pos"][2]);
-    }
-    if (data[i].hasOwnProperty("rot")) {
-      if (data[i]["rot"].length == 3) {
-        body.quaternion.setFromEuler(
-          new THREE.Euler(
-            Math.PI * data[i]["rot"][1] / 180,
-            Math.PI * data[i]["rot"][0] / 180,
-            Math.PI * data[i]["rot"][2] / 180
-          )
-        );
-
-
-      } else if (data[i]["rot"].length == 4) {
-        body.quaternion.set(data[i]["rot"][0],data[i]["rot"][1],data[i]["rot"][2],data[i]["rot"][3]);
+    if (typeof body !== "undefined") {
+      if (data[i].hasOwnProperty("pos")) {
+        body.position.set(data[i]["pos"][0],data[i]["pos"][1],data[i]["pos"][2]);
       }
+      if (data[i].hasOwnProperty("rot")) {
+        if (data[i]["rot"].length == 3) {
+          body.quaternion.setFromEuler(
+            new THREE.Euler(
+              Math.PI * data[i]["rot"][1] / 180,
+              Math.PI * data[i]["rot"][0] / 180,
+              Math.PI * data[i]["rot"][2] / 180
+            )
+          );
 
+
+        } else if (data[i]["rot"].length == 4) {
+          body.quaternion.set(data[i]["rot"][0],data[i]["rot"][1],data[i]["rot"][2],data[i]["rot"][3]);
+        }
+
+      }
     }
 
     id = data[i]["id"];
