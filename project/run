@@ -141,17 +141,17 @@ elif [ "$1" = "joint_create" ];then shift
 elif [ "$1" = "ik_setup" ];then shift
   jq -M -c -n \
     '
-      {command:"body_create",id:"root",mass:0,size:[2,2,2],pos:[0,0,15],rot:[0,0,0],json:{color:"#f88"}}
+      {command:"body_create",id:"root",mass:0,size:[2,2,2],pos:[0,0,10],rot:[0,0,0],json:{color:"#f88"}}
       ,
       {command:"body_create",id:"link1",mass:1,size:[1,1,4],pos:[0,0,5],rot:[0,0,0],json:{color:"#8f8"}}
       ,
       {command:"body_create",id:"link2",mass:1,size:[1,1,4],pos:[0,0,5],rot:[0,0,0],json:{color:"#88f"}}
       ,
       {command:"joint_create",id:"j1",id1:"root",id2:"link1",
-        pos1:[0,0,2],pos2:[0,0,-2],rot1:[0,0,0,1],rot2:[0,0,0,1]}
+        pos1:[0,0,1],pos2:[0,0,-2],rot1:[0,0,0],rot2:[0,0,0]}
       ,
       {command:"joint_create",id:"j2",id1:"link1",id2:"link2",
-        pos1:[0,0,2],pos2:[0,0,-2],rot1:[0,0,0,1],rot2:[0,0,0,1]}
+        pos1:[0,0,2],pos2:[0,0,-2],rot1:[0,0,0],rot2:[0,0,0]}
       ,
       {command:"joint_settings",id:"j1",settings:[
         {index:3,limits:[-1,1]},{index:4,limits:[-1,1]}]}
@@ -275,6 +275,10 @@ elif [ "$1" = "stack" ];then shift
     {command:"body_create",id:($id+"8"),mass:1,size:[1,1,1],pos:[0,0,28],json:{text:($id+"8"),color:"rgb(50,50,150)"}},
     {command:"body_create",id:($id+"9"),mass:1,size:[1,1,1],pos:[0,0,29],json:{text:($id+"9"),color:"rgb(50,50,150)"}}
     ' \
+  | socat - TCP:localhost:9999
+
+elif [ "$1" = "json" ];then shift
+  jq -M -c '.' \
   | socat - TCP:localhost:9999
 
 else

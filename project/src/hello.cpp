@@ -281,13 +281,44 @@ int main(int argc, char** argv)
               if ( (it1 != bodyMapPair.end())  && (it2 != bodyMapPair.end())  ) {
                 btRigidBody* body1 = it1->second.first;
                 btRigidBody* body2 = it2->second.first;
-                btTransform pivotInA(
-                    btQuaternion(
+
+                btQuaternion body1rot;
+                btQuaternion body2rot;
+
+                if (json_line["rot1"].size() == 3 ) {
+                    body1rot = btQuaternion(
+                      PI * json_line["rot1"][0].get<float>() / 180.0,
+                      PI * json_line["rot1"][1].get<float>() / 180.0,
+                      PI * json_line["rot1"][2].get<float>() / 180.0
+                    );
+                } 
+                else if (json_line["rot1"].size() == 4 ) {
+                    body1rot = btQuaternion(
                       json_line["rot1"][0].get<float>(),
                       json_line["rot1"][1].get<float>(),
                       json_line["rot1"][2].get<float>(),
                       json_line["rot1"][3].get<float>()
-                    ), 
+                    );
+                }
+
+                if (json_line["rot2"].size() == 3 ) {
+                    body1rot = btQuaternion(
+                      PI * json_line["rot2"][0].get<float>() / 180.0,
+                      PI * json_line["rot2"][1].get<float>() / 180.0,
+                      PI * json_line["rot2"][2].get<float>() / 180.0
+                    );
+                } 
+                else if (json_line["rot2"].size() == 4 ) {
+                    body1rot = btQuaternion(
+                      json_line["rot2"][0].get<float>(),
+                      json_line["rot2"][1].get<float>(),
+                      json_line["rot2"][2].get<float>(),
+                      json_line["rot2"][3].get<float>()
+                    );
+                }
+
+                btTransform pivotInA(
+                    body1rot,
                     btVector3(
                       json_line["pos1"][0].get<float>(),
                       json_line["pos1"][1].get<float>(),
@@ -295,12 +326,7 @@ int main(int argc, char** argv)
                       )
                     );  
                 btTransform pivotInB(
-                    btQuaternion(
-                      json_line["rot2"][0].get<float>(),
-                      json_line["rot2"][1].get<float>(),
-                      json_line["rot2"][2].get<float>(),
-                      json_line["rot2"][3].get<float>()
-                    ), 
+                    body2rot,
                     btVector3(
                       json_line["pos2"][0].get<float>(),
                       json_line["pos2"][1].get<float>(),
@@ -382,7 +408,9 @@ int main(int argc, char** argv)
                     constraint->setMaxMotorForce(index, setting["maxmotorforce"].get<float>());
                   }
                   if (setting.find("servotarget") != setting.end()) {
-                    constraint->setServoTarget(index, setting["servotarget"].get<float>());
+                    constraint->setServoTarget(index, 
+                        PI * setting["servotarget"].get<float>() / 180.0
+                        );
                   }
                   if (setting.find("motor") != setting.end()) {
                     constraint->enableMotor(index, setting["motor"].get<bool>());
@@ -391,7 +419,10 @@ int main(int argc, char** argv)
                     constraint->setServo(index, setting["servo"].get<bool>());
                   }
                   if (setting.find("limits") != setting.end()) {
-                    constraint->setLimit(index, setting["limits"][0].get<float>(), setting["limits"][1].get<float>());
+                    constraint->setLimit(index, 
+                        PI * setting["limits"][0].get<float>() / 180.0, 
+                        PI * setting["limits"][1].get<float>() / 180.0
+                        );
                   }
                 }
               }
@@ -464,6 +495,7 @@ int main(int argc, char** argv)
             {
               body->getMotionState()->getWorldTransform(trans);
             }
+            // std::cerr << "id: " << it->first << " x: " <<  trans.getOrigin().getX() << std::endl;
             printf("{");
             printf(
                 "\"id\":\"%s\",\"type\":\"box\",\"pos\":[%f,%f,%f],\"rot\":[%f,%f,%f,%f],\"size\":[%f,%f,%f]", 

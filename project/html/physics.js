@@ -371,7 +371,10 @@ function update_bodies(data) {
   // console.log("unused ids: ",all_ids);
   for (i in all_ids) {
     console.log("remove : ",all_ids[i]);
-    scene.remove(scene.getObjectByProperty("bullet_id", all_ids[i]));
+    var body = scene.getObjectByProperty("bullet_id", all_ids[i]);
+    body.geometry.dispose();
+    body.material.forEach((i)=>{ console.log("dispose:",i);i.dispose();});
+    scene.remove(body);
   }
 }
 
@@ -450,6 +453,8 @@ function debug_bodies(data) {
     console.log("remove : ",all_ids[i]);
     // scene.remove(scene.getObjectByProperty("bullet_id", all_ids[i]));
     var object_to_remove = scene.getObjectByProperty("bullet_id", all_ids[i]);
+    object_to_remove.geometry.dispose();
+    object_to_remove.material.forEach((i)=>{console.log("dispose:",i);i.dispose();});
     object_to_remove.parent.remove(object_to_remove);
   }
 }
