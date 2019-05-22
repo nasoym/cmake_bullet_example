@@ -1,6 +1,7 @@
 # cmake_bullet_example
 
 https://appliedgo.net/roboticarm/
+http://old.cescg.org/CESCG-2002/LBarinka/paper.pdf
 
 ## todos
   * delete render shapes
