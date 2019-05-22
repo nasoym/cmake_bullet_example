@@ -282,8 +282,8 @@ int main(int argc, char** argv)
                 btRigidBody* body1 = it1->second.first;
                 btRigidBody* body2 = it2->second.first;
 
-                btQuaternion body1rot;
-                btQuaternion body2rot;
+                btQuaternion body1rot = btQuaternion();
+                btQuaternion body2rot = btQuaternion();
 
                 if (json_line["rot1"].size() == 3 ) {
                     body1rot = btQuaternion(

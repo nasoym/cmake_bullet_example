@@ -120,6 +120,18 @@ function init() {
   // stats = new Stats();
   // document.body.appendChild( stats.dom );
 
+  // var dir = new THREE.Vector3( 1, 0, 0 );
+  // dir.normalize();
+  // var origin = new THREE.Vector3( 0, 0, 0 );
+  // var length = 1;
+  // var hex = 0xff0000;
+  // var arrowHelper = new THREE.ArrowHelper( dir, origin, length, 0xff0000 );
+  // scene.add( arrowHelper );
+
+  var axesHelper = new THREE.AxesHelper( 5 );
+  scene.add( axesHelper );
+
+
   raycaster = new THREE.Raycaster();
   window.addEventListener( 'click', onDocumentMouseClick, false );
 
