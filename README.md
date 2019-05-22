@@ -1,9 +1,9 @@
 # cmake_bullet_example
 
+https://appliedgo.net/roboticarm/
 
 ## todos
   * delete render shapes
-  * delete joints
   * solve ik target
   * -----
   * show body id on three.js touch (also for debug bodies)
