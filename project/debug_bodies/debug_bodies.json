@@ -2,10 +2,10 @@
   {
     "type": "box",
     "id": "debug-6667",
-    "parentid":"13897",
-    "pos": [2,0.5,0],
-    "size": [2,1,1],
-    "rot": [0,0,60],
+    "parentid":"root",
+    "pos": [0,0,6],
+    "size": [2,0.2,0.2],
+    "rot": [0,0,0],
     "json":{"color":"#eee","opacity":0.1,"castShadow":false,"receiveShadow":false,"wireframe":true}
   }
 ]

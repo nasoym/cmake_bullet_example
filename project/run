@@ -145,31 +145,33 @@ elif [ "$1" = "ik_setup" ];then shift
       ,
       {command:"body_create",id:"link1",mass:1,size:[1,1,4],pos:[0,0,5],rot:[0,0,0],json:{color:"#8f8"}}
       ,
-      {command:"body_create",id:"link2",mass:1,size:[1,1,4],pos:[0,0,5],rot:[0,0,0],json:{color:"#88f"}}
+      {command:"body_create",id:"link2",mass:1,size:[1,1,5],pos:[0,0,5],rot:[0,0,0],json:{color:"#88f"}}
       ,
       {command:"joint_create",id:"j1",id1:"root",id2:"link1",
-        pos1:[0,0,1],pos2:[0,0,-2],rot1:[0,0,0,1],rot2:[0,-30,0]}
+        pos1:[0,0,1],pos2:[0,0,-2],rot1:[0,0,0],rot2:[0,0,0]}
       ,
       {command:"joint_create",id:"j2",id1:"link1",id2:"link2",
-        pos1:[0,0,2],pos2:[0,0,-2],rot1:[0,0,0,1],rot2:[0,0,0,1]}
+        pos1:[0,0,2],pos2:[0,0,-2.5],rot1:[0,0,0],rot2:[0,0,0]}
       ,
       {command:"joint_settings",id:"j1",settings:[
-        {index:3,limits:[-60,60]},{index:4,limits:[0,0]},{index:5,limits:[0,0]}]}
+        {index:4,limits:[0,0]},{index:3,limits:[-20,0]},{index:5,limits:[0,0]}]}
       ,
       {command:"joint_settings",id:"j2",settings:[
-        {index:3,limits:[-60,60]},{index:4,limits:[0,0]},{index:5,limits:[0,0]}]}
+        {index:4,limits:[0,0]},{index:3,limits:[-140,-90]},{index:5,limits:[0,0]}]}
     ' \
   | socat - TCP:localhost:9999
 
 elif [ "$1" = "ik_set" ];then shift
-  jq -M -c -n \
+  target1="$1";shift
+  target2="$1";shift
+  jq -M -c -n --arg target1 "${target1}" --arg target2 "${target2}" \
     '
       {command:"joint_settings",id:"j1",settings:[
-        {index:3,motor:true,targetvelocity:2.0,maxmotorforce:400,servo:true,servotarget:-30.0}
+        {index:3,motor:true,targetvelocity:2.0,maxmotorforce:400,servo:true,servotarget:($target1|tonumber)}
         ]}
       ,
       {command:"joint_settings",id:"j2",settings:[
-        {index:3,motor:true,targetvelocity:2.0,maxmotorforce:400,servo:true,servotarget:0.0}
+        {index:3,motor:true,targetvelocity:2.0,maxmotorforce:400,servo:true,servotarget:($target2|tonumber)}
         ]}
     ' \
   | socat - TCP:localhost:9999
