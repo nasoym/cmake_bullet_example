@@ -397,6 +397,7 @@ function setup_update_listener(address,exchange_name) {
 
   var on_connect = function(x) {
     id = client.subscribe("/exchange/"+exchange_name, function(d) {
+      // console.log("body: ", d.body);
       update_bodies(JSON.parse(d.body));
     });
   };

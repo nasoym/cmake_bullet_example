@@ -11,6 +11,7 @@ if [[ "${trace:=0}" -eq 1 ]];then
   export trace
 fi
 
+apt-get update
 apt-get install -y socat
 apt-get install -y curl
 

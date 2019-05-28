@@ -15,7 +15,8 @@ def angles(x, y, len1, len2):
   D2 = lawOfCosines(dist, len1, len2)
   A1 = D1 + D2
   A2 = lawOfCosines(len1, len2, dist)
-  return deg(A1), deg(A2)
+  return A1, A2
+  # return deg(A1), deg(A2)
 
 #   y
 #   |             -
@@ -33,6 +34,9 @@ def angles(x, y, len1, len2):
 #   | /. A1          D1
 #   (0,0)---------------------------------------x
 
-print(angles(10,0,10,10))
-print(angles(5,0,10,10))
+# print(angles(10,0,10,10))
+# print(angles(5,0,10,10))
+a,b = angles(3,5,4,5)
+print(math.pi/2-a,math.pi-b) 
+# print(angles(4,8,4,5))
 

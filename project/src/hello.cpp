@@ -412,6 +412,11 @@ int main(int argc, char** argv)
                         PI * setting["servotarget"].get<float>() / 180.0
                         );
                   }
+                  if (setting.find("servotarget_rad") != setting.end()) {
+                    constraint->setServoTarget(index, 
+                        setting["servotarget_rad"].get<float>()
+                        );
+                  }
                   if (setting.find("motor") != setting.end()) {
                     constraint->enableMotor(index, setting["motor"].get<bool>());
                   }
@@ -495,7 +500,18 @@ int main(int argc, char** argv)
             {
               body->getMotionState()->getWorldTransform(trans);
             }
-            // std::cerr << "id: " << it->first << " x: " <<  trans.getOrigin().getX() << std::endl;
+            // std::cerr << "(1)id:" << it->first 
+            //   << " x:" <<  trans.getOrigin().getX() 
+            //   << " y:" <<  trans.getOrigin().getY() 
+            //   << " z:" <<  trans.getOrigin().getZ() 
+            //   << std::endl;
+            // fprintf( stderr, "(2)id:%s x:%f y:%f z:%f\n", 
+            //     it->first.c_str(), 
+            //     float(trans.getOrigin().getX()), 
+            //     float(trans.getOrigin().getY()), 
+            //     float(trans.getOrigin().getZ())
+            //     );
+
             printf("{");
             printf(
                 "\"id\":\"%s\",\"type\":\"box\",\"pos\":[%f,%f,%f],\"rot\":[%f,%f,%f,%f],\"size\":[%f,%f,%f]", 
