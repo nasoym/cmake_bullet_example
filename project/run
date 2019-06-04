@@ -138,47 +138,58 @@ elif [ "$1" = "joint_create" ];then shift
   | socat - TCP:localhost:9999
   echo "joint:$id body1:$id1 body2:$id2"
 
+elif [ "$1" = "ik_setup2" ];then shift
+  jq -M -c -n \
+    '
+      {command:"body_create",id:"root",mass:0,size:[2,2,2],pos:[0,0,5],rot:[0,0,0,1],json:{color:"#f88",opacity:0.8}}
+      ,
+      {command:"body_create",id:"link1",mass:0,size:[1,1,4],pos:[0,0,8],rot:[0,0,0,1],json:{color:"#8f8",opacity:0.8}}
+      ,
+      {command:"body_create",id:"link2",mass:0,size:[1,1,5],pos:[0,0,12.5],rot:[0,0,0,1],json:{color:"#88f",opacity:0.8}}
+    ' \
+  | socat - TCP:localhost:9999
+
 elif [ "$1" = "ik_setup" ];then shift
   jq -M -c -n \
     '
-      {command:"body_create",id:"root",mass:0,size:[2,2,2],pos:[0,0,10],rot:[0,0,0],json:{color:"#f88"}}
+      {command:"body_create",id:"root",mass:0,size:[2,2,2],pos:[0,0,5],rot:[0,0,0,1],json:{color:"#f88"}}
       ,
-      {command:"body_create",id:"link1",mass:1,size:[1,1,4],pos:[0,0,5],rot:[0,0,0],json:{color:"#8f8"}}
+      {command:"body_create",id:"link1",mass:1,size:[1,1,4],pos:[0,0,8],rot:[0,0,0,1],json:{color:"#8f8"}}
       ,
-      {command:"body_create",id:"link2",mass:1,size:[1,1,5],pos:[0,0,5],rot:[0,0,0],json:{color:"#88f"}}
+      {command:"body_create",id:"link2",mass:1,size:[1,1,5],pos:[0,0,12.5],rot:[0,0,0,1],json:{color:"#88f"}}
       ,
       {command:"joint_create",id:"j1",id1:"root",id2:"link1",
-        pos1:[0,0,1],pos2:[0,0,-2],rot1:[0,0,0],rot2:[0,0,0]}
+        pos1:[0,0,1],pos2:[0,0,-2],rot1:[0,0,0,1],rot2:[0,0,0,1]}
       ,
       {command:"joint_create",id:"j2",id1:"link1",id2:"link2",
-        pos1:[0,0,2],pos2:[0,0,-2.5],rot1:[0,0,0],rot2:[0,0,0]}
+        pos1:[0,0,2],pos2:[0,0,-2.5],rot1:[0,0,0,1],rot2:[0,0,0,1]}
       ,
       {command:"joint_settings",id:"j1",settings:[
-        {index:4,limits:[-80,00]},{index:3,limits:[-0,0]},{index:5,limits:[0,0]}]}
+        {index:4,limits:[-90,90],bounce:0,spring:true,stiffness:100,damping:50},{index:3,limits:[-90,90],bounce:0,spring:true,stiffness:100,damping:50},{index:5,limits:[0,0],bounce:0,spring:true,stiffness:100,damping:50}]}
       ,
       {command:"joint_settings",id:"j2",settings:[
-        {index:4,limits:[-80,80]},{index:3,limits:[-0,0]},{index:5,limits:[0,0]}]}
+        {index:4,limits:[-90,90],bounce:0,spring:true,stiffness:100,damping:50},{index:3,limits:[-90,90],bounce:0,spring:true,stiffness:100,damping:50},{index:5,limits:[0,0],bounce:0,spring:true,stiffness:100,damping:50}]}
     ' \
   | socat - TCP:localhost:9999
 
 elif [ "$1" = "ik_set" ];then shift
-  target11="$1";shift
-  target12="$1";shift
-  jq -M -c -n \
-    --arg target11 "${target11}" \
-    --arg target12 "${target12}" \
-    '
-      {command:"joint_settings",id:"j1",settings:[
-        {index:4,motor:true,targetvelocity:1.0,maxmotorforce:200,servo:true,servotarget_rad:($target11|tonumber)}
-        ]}
-      ,
-      {command:"joint_settings",id:"j2",settings:[
-        {index:4,motor:true,targetvelocity:1.0,maxmotorforce:200,servo:true,servotarget_rad:($target12|tonumber)}
-        ]}
-    ' \
-  | socat - TCP:localhost:9999
-
-    exit
+  # target11="$1";shift
+  # target12="$1";shift
+  # jq -M -c -n \
+  #   --arg target11 "${target11}" \
+  #   --arg target12 "${target12}" \
+  #   '
+  #     {command:"joint_settings",id:"j1",settings:[
+  #       {index:4,motor:true,targetvelocity:1.0,maxmotorforce:200,servo:true,servotarget_rad:($target11|tonumber)}
+  #       ]}
+  #     ,
+  #     {command:"joint_settings",id:"j2",settings:[
+  #       {index:4,motor:true,targetvelocity:1.0,maxmotorforce:200,servo:true,servotarget_rad:($target12|tonumber)}
+  #       ]}
+  #   ' \
+  # | socat - TCP:localhost:9999
+  #
+  #   exit
   target1="$1";shift
   target2="$1";shift
   target11="$1";shift
@@ -206,8 +217,8 @@ elif [ "$1" = "ik_target" ];then shift
   y="$1";shift
   z="$1";shift
 
-  # ${0} ik_set $(python3 inverse_kinematics.py ${y} ${z} 4 5) $(python3 inverse_kinematics.py ${x} ${z} 4 5)
-  ${0} ik_set $(python3 inverse_kinematics.py ${x} ${z} 4 5)
+  ${0} ik_set $(python3 inverse_kinematics.py ${y} ${z} 4 5) $(python3 inverse_kinematics.py ${x} ${z} 4 5)
+  # ${0} ik_set $(python3 inverse_kinematics.py ${x} ${z} 4 5)
   jq ".[0].pos = [(${x}*-1),${y},(${z}+1)]" debug_bodies/debug_bodies.json | sponge debug_bodies/debug_bodies.json
 
 elif [ "$1" = "joint_delete" ];then shift

@@ -2,6 +2,9 @@
 
 https://appliedgo.net/roboticarm/
 http://old.cescg.org/CESCG-2002/LBarinka/paper.pdf
+https://www.euclideanspace.com/maths/geometry/rotations/conversions/eulerToQuaternion/steps/
+
+
 
 ## todos
   * delete render shapes
