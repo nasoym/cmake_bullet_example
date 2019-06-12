@@ -6,12 +6,39 @@
     "pos": [
       -0,
       0,
-      8
+      10
     ],
     "size": [
       2,
       0.2,
       0.2
+    ],
+    "rot": [
+      0,
+      0,
+      0
+    ],
+    "json": {
+      "color": "#eee",
+      "opacity": 0.1,
+      "castShadow": false,
+      "receiveShadow": false,
+      "wireframe": true
+    }
+  },
+  {
+    "type": "box",
+    "id": "debug-6668",
+    "parentid": "root",
+    "pos": [
+      0,
+      0,
+      5
+    ],
+    "size": [
+      0.2,
+      0.2,
+      10
     ],
     "rot": [
       0,

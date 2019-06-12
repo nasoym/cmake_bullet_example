@@ -165,10 +165,16 @@ elif [ "$1" = "ik_setup" ];then shift
         pos1:[0,0,2],pos2:[0,0,-2.5],rot1:[0,0,0,1],rot2:[0,0,0,1]}
       ,
       {command:"joint_settings",id:"j1",settings:[
-        {index:4,limits:[-90,90],bounce:0,spring:true,stiffness:100,damping:50},{index:3,limits:[-90,90],bounce:0,spring:true,stiffness:100,damping:50},{index:5,limits:[0,0],bounce:0,spring:true,stiffness:100,damping:50}]}
+        {index:3,limits:[-90,90],bounce:0,spring:true,stiffness:100,damping:50},
+        {index:4,limits:[-90,90],bounce:0,spring:true,stiffness:100,damping:50},
+        {index:5,limits:[0,0],bounce:0,spring:true,stiffness:10,damping:10}
+        ]}
       ,
       {command:"joint_settings",id:"j2",settings:[
-        {index:4,limits:[-90,90],bounce:0,spring:true,stiffness:100,damping:50},{index:3,limits:[-90,90],bounce:0,spring:true,stiffness:100,damping:50},{index:5,limits:[0,0],bounce:0,spring:true,stiffness:100,damping:50}]}
+        {index:3,limits:[-90,90],bounce:0,spring:true,stiffness:100,damping:50},
+        {index:4,limits:[-90,90],bounce:0,spring:true,stiffness:100,damping:50},
+        {index:5,limits:[0,0],bounce:0,spring:true,stiffness:10,damping:10}
+        ]}
     ' \
   | socat - TCP:localhost:9999
 
@@ -212,13 +218,47 @@ elif [ "$1" = "ik_set" ];then shift
     ' \
   | socat - TCP:localhost:9999
 
+elif [ "$1" = "ik_set_3" ];then shift
+  target1="$1";shift
+  target2="$1";shift
+  jq -M -c -n \
+    --arg target1 "${target1}" \
+    --arg target2 "${target2}" \
+    '
+      {command:"joint_settings",id:"j1",settings:[
+        {index:3,motor:true,targetvelocity:1.0,maxmotorforce:200,servo:true,servotarget_rad:($target1|tonumber)}
+        ]}
+      ,
+      {command:"joint_settings",id:"j2",settings:[
+        {index:3,motor:true,targetvelocity:1.0,maxmotorforce:200,servo:true,servotarget_rad:($target2|tonumber)}
+        ]}
+    ' \
+  | socat - TCP:localhost:9999
+
+elif [ "$1" = "ik_set_4" ];then shift
+  target1="$1";shift
+  target2="$1";shift
+  jq -M -c -n \
+    --arg target1 "${target1}" \
+    --arg target2 "${target2}" \
+    '
+      {command:"joint_settings",id:"j1",settings:[
+        {index:4,motor:true,targetvelocity:1.0,maxmotorforce:200,servo:true,servotarget_rad:($target1|tonumber)}
+        ]}
+      ,
+      {command:"joint_settings",id:"j2",settings:[
+        {index:4,motor:true,targetvelocity:1.0,maxmotorforce:200,servo:true,servotarget_rad:($target2|tonumber)}
+        ]}
+    ' \
+  | socat - TCP:localhost:9999
+
 elif [ "$1" = "ik_target" ];then shift
   x="$1";shift
   y="$1";shift
   z="$1";shift
 
-  ${0} ik_set $(python3 inverse_kinematics.py ${y} ${z} 4 5) $(python3 inverse_kinematics.py ${x} ${z} 4 5)
-  # ${0} ik_set $(python3 inverse_kinematics.py ${x} ${z} 4 5)
+  ${0} ik_set_3 $(python3 inverse_kinematics.py ${y} ${z} 4 5) 
+  # ${0} ik_set_4 $(python3 inverse_kinematics.py ${x} ${z} 4 5)
   jq ".[0].pos = [(${x}*-1),${y},(${z}+1)]" debug_bodies/debug_bodies.json | sponge debug_bodies/debug_bodies.json
 
 elif [ "$1" = "joint_delete" ];then shift

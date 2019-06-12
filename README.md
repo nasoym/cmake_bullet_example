@@ -3,12 +3,13 @@
 https://appliedgo.net/roboticarm/
 http://old.cescg.org/CESCG-2002/LBarinka/paper.pdf
 https://www.euclideanspace.com/maths/geometry/rotations/conversions/eulerToQuaternion/steps/
-
+http://theorangeduck.com/page/simple-two-joint
 
 
 ## todos
   * delete render shapes
   * solve ik target
+  * solve NaN problem
   * -----
   * show body id on three.js touch (also for debug bodies)
   * set body mass

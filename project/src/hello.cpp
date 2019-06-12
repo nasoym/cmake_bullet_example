@@ -3,6 +3,7 @@
 #include "BulletDynamics/ConstraintSolver/btGeneric6DofSpring2Constraint.h"
 
 #include <stdio.h>
+#include <math.h>
 
 #include <iostream>
 #include <string>
@@ -500,18 +501,35 @@ int main(int argc, char** argv)
             {
               body->getMotionState()->getWorldTransform(trans);
             }
-            // std::cerr << "(1)id:" << it->first 
-            //   << " x:" <<  trans.getOrigin().getX() 
-            //   << " y:" <<  trans.getOrigin().getY() 
-            //   << " z:" <<  trans.getOrigin().getZ() 
-            //   << std::endl;
-            // fprintf( stderr, "(2)id:%s x:%f y:%f z:%f\n", 
-            //     it->first.c_str(), 
-            //     float(trans.getOrigin().getX()), 
-            //     float(trans.getOrigin().getY()), 
-            //     float(trans.getOrigin().getZ())
-            //     );
 
+            if (
+                 (isnan(trans.getOrigin().getX()))
+                 || 
+                 (isnan(trans.getOrigin().getY()))
+                 || 
+                 (isnan(trans.getOrigin().getZ()))
+                 || 
+                 (isnan(trans.getRotation().getX()))
+                 || 
+                 (isnan(trans.getRotation().getY()))
+                 || 
+                 (isnan(trans.getRotation().getZ()))
+                 || 
+                 (isnan(trans.getRotation().getW()))
+               ) {
+              std::cerr << "(1)id: isnan: " << it->first 
+                << " x:" <<  trans.getOrigin().getX() 
+                << " y:" <<  trans.getOrigin().getY() 
+                << " z:" <<  trans.getOrigin().getZ() 
+                << std::endl;
+              fprintf( stderr, "(2)id:%s x:%f y:%f z:%f\n", 
+                  it->first.c_str(), 
+                  float(trans.getOrigin().getX()), 
+                  float(trans.getOrigin().getY()), 
+                  float(trans.getOrigin().getZ())
+                  );
+
+            }
             printf("{");
             printf(
                 "\"id\":\"%s\",\"type\":\"box\",\"pos\":[%f,%f,%f],\"rot\":[%f,%f,%f,%f],\"size\":[%f,%f,%f]", 
