@@ -235,6 +235,7 @@ int main(int argc, char** argv)
               }
               btDefaultMotionState* myMotionState = new btDefaultMotionState(trans);
               body->setMotionState(myMotionState);
+              body->activate();
 
             }
           }
@@ -528,6 +529,22 @@ int main(int argc, char** argv)
                   float(trans.getOrigin().getY()), 
                   float(trans.getOrigin().getZ())
                   );
+
+              // btTransform trans2;
+              trans.setIdentity();
+              // if (body && body->getMotionState()) {
+              //   body->getMotionState()->getWorldTransform(trans);
+              // }
+              btDefaultMotionState* myMotionState = new btDefaultMotionState(trans);
+              myMotionState->setWorldTransform(trans);
+              body->setMotionState(myMotionState);
+              btVector3 localInertia = body->getLocalInertia();
+              body->setMassProps(1.0, localInertia);
+              body->activate();
+
+
+
+
 
             }
             printf("{");

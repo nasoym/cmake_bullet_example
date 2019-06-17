@@ -143,9 +143,9 @@ elif [ "$1" = "ik_setup2" ];then shift
     '
       {command:"body_create",id:"root",mass:0,size:[2,2,2],pos:[0,0,5],rot:[0,0,0,1],json:{color:"#f88",opacity:0.8}}
       ,
-      {command:"body_create",id:"link1",mass:0,size:[1,1,4],pos:[0,0,8],rot:[0,0,0,1],json:{color:"#8f8",opacity:0.8}}
+      {command:"body_create",id:"link1",mass:1,size:[1,1,4],pos:[0,0,8],rot:[0,0,0,1],json:{color:"#8f8",opacity:0.8}}
       ,
-      {command:"body_create",id:"link2",mass:0,size:[1,1,5],pos:[0,0,12.5],rot:[0,0,0,1],json:{color:"#88f",opacity:0.8}}
+      {command:"body_create",id:"link2",mass:1,size:[1,1,5],pos:[0,0,12.5],rot:[0,0,0,1],json:{color:"#88f",opacity:0.8}}
     ' \
   | socat - TCP:localhost:9999
 
@@ -165,18 +165,37 @@ elif [ "$1" = "ik_setup" ];then shift
         pos1:[0,0,2],pos2:[0,0,-2.5],rot1:[0,0,0,1],rot2:[0,0,0,1]}
       ,
       {command:"joint_settings",id:"j1",settings:[
-        {index:3,limits:[-90,90],bounce:0,spring:true,stiffness:100,damping:50},
-        {index:4,limits:[-90,90],bounce:0,spring:true,stiffness:100,damping:50},
+        {index:3,limits:[0,0],bounce:0,spring:true,stiffness:100,damping:50},
+        {index:4,limits:[0,0],bounce:0,spring:true,stiffness:100,damping:50},
         {index:5,limits:[0,0],bounce:0,spring:true,stiffness:10,damping:10}
         ]}
       ,
       {command:"joint_settings",id:"j2",settings:[
-        {index:3,limits:[-90,90],bounce:0,spring:true,stiffness:100,damping:50},
-        {index:4,limits:[-90,90],bounce:0,spring:true,stiffness:100,damping:50},
+        {index:3,limits:[0,0],bounce:0,spring:true,stiffness:100,damping:50},
+        {index:4,limits:[0,0],bounce:0,spring:true,stiffness:100,damping:50},
         {index:5,limits:[0,0],bounce:0,spring:true,stiffness:10,damping:10}
         ]}
     ' \
   | socat - TCP:localhost:9999
+
+elif [ "$1" = "ik_setup3" ];then shift
+  jq -M -c -n \
+    '
+      {command:"body_create",id:"root",mass:0,size:[2,2,2],pos:[0,0,5],rot:[0,0,0,1],json:{color:"#f88"}}
+      ,
+      {command:"body_create",id:"link1",mass:1,size:[1,1,4],pos:[0,0,18],rot:[0,0,0,1],json:{color:"#8f8"}}
+      ,
+      {command:"joint_create",id:"j1",id1:"root",id2:"link1",
+        pos1:[0,0,1],pos2:[0,0,-2],rot1:[0,0,0,1],rot2:[0,0,0,1]}
+      ,
+      {command:"joint_settings",id:"j1",settings:[
+        {index:3,limits:[0,0],bounce:0,spring:true,stiffness:100,damping:50},
+        {index:4,limits:[0,0],bounce:0,spring:true,stiffness:100,damping:50},
+        {index:5,limits:[0,0],bounce:0,spring:true,stiffness:10,damping:10}
+        ]}
+    ' \
+  | socat - TCP:localhost:9999
+
 
 elif [ "$1" = "ik_set" ];then shift
   # target11="$1";shift
