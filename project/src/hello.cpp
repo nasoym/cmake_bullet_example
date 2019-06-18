@@ -164,6 +164,28 @@ int main(int argc, char** argv)
                     )
                   );
 
+              if (json_line.find("rot") != json_line.end()) {
+                if (json_line["rot"].size() == 3 ) {
+                  startTransform.setRotation(
+                    btQuaternion(
+                      PI * json_line["rot"][0].get<float>() / 180.0,
+                      PI * json_line["rot"][1].get<float>() / 180.0,
+                      PI * json_line["rot"][2].get<float>() / 180.0
+                    ) 
+                    );
+                } 
+                else if (json_line["rot"].size() == 4 ) {
+                  startTransform.setRotation(
+                    btQuaternion(
+                      json_line["rot"][0].get<float>(),
+                      json_line["rot"][1].get<float>(),
+                      json_line["rot"][2].get<float>(),
+                      json_line["rot"][3].get<float>()
+                    ) 
+                    );
+                }
+              }
+
               //using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
               btDefaultMotionState* myMotionState = new btDefaultMotionState(startTransform);
               btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, myMotionState, colShape, localInertia);

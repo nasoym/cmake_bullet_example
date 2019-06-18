@@ -23,8 +23,8 @@ done
 rm -rf /cmake_bullet/build || true
 mkdir -p /cmake_bullet/build 
 cd /cmake_bullet/build 
-cmake ../
-make
+cmake -DCMAKE_BUILD_TYPE=DEBUG -DCMAKE_CXX_FLAGS_DEBUG="-g -O0" -DCMAKE_C_FLAGS_DEBUG="-g -O0" ../
+make VERBOSE=1
 cd /cmake_bullet
   socat TCP-LISTEN:9999,reuseaddr,fork STDOUT \
     | ./build/hello \
