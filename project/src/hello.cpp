@@ -150,11 +150,16 @@ int main(int argc, char** argv)
               btScalar mass(json_line["mass"].get<float>());
 
               //rigidbody is dynamic if and only if mass is non zero, otherwise static
-              bool isDynamic = (mass != 0.f);
+              // bool isDynamic = (mass != 0.f);
 
               btVector3 localInertia(0, 0, 0);
-              if (isDynamic)
-                colShape->calculateLocalInertia(mass, localInertia);
+              // if (isDynamic)
+              colShape->calculateLocalInertia(mass, localInertia);
+              // std::cerr << "create body: local inertia"
+              //   << " x:" <<  localInertia.getX() 
+              //   << " y:" <<  localInertia.getY() 
+              //   << " z:" <<  localInertia.getZ() 
+              //   << std::endl;
 
               startTransform.setOrigin(
                   btVector3(
@@ -190,6 +195,11 @@ int main(int argc, char** argv)
               btDefaultMotionState* myMotionState = new btDefaultMotionState(startTransform);
               btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, myMotionState, colShape, localInertia);
               btRigidBody* body = new btRigidBody(rbInfo);
+
+
+              // body->setMassProps(mass, btVector3(0, 0, 0));
+              // body->activate();
+
 
               body->forceActivationState(DISABLE_DEACTIVATION);
 
@@ -561,8 +571,11 @@ int main(int argc, char** argv)
               myMotionState->setWorldTransform(trans);
               body->setMotionState(myMotionState);
               btVector3 localInertia = body->getLocalInertia();
-              body->setMassProps(1.0, localInertia);
+              body->setMassProps(body->getInvMass(), localInertia);
               body->activate();
+              // std::cerr << "(1)id: isnan: " << it->first 
+              //   << " mass:" <<  body->getInvMass()
+              //   << std::endl;
 
 
 

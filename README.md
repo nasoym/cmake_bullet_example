@@ -9,6 +9,8 @@ http://theorangeduck.com/page/simple-two-joint
 isnan
 https://pybullet.org/Bullet/phpBB3/viewtopic.php?t=12080
 https://stackoverflow.com/questions/28159306/libgdx-bullet-3d-and-rolling-friction-causing-nan
+https://stackoverflow.com/questions/12896706/bullet-physics-and-nan-values
+
 ## todos
   * delete render shapes
   * solve ik target
