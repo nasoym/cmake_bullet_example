@@ -227,8 +227,14 @@ elif [ "$1" = "ik_setup4" ];then shift
   jq -M -c -n \
     --argjson rot "${rot}" \
     '
-      {command:"body_create",id:"root",mass:0,size:[5,2.5,1],pos:[0,0,5],rot:$rot,json:{color:"#f88"}}
-      ,
+      {command:"body_create",id:"root",mass:1,size:[5,2.5,1],pos:[0,0,5],rot:$rot,json:{color:"#f88"}}
+    ' \
+  | socat - TCP:localhost:9999
+
+elif [ "$1" = "ik_setup4_2" ];then shift
+
+  jq -M -c -n \
+    '
       {command:"body_create",id:"link1",mass:1,size:[1.5,1.5,2.0],pos:[0,0,5],rot:[0,0,0,1],json:{color:"#8f8"}}
       ,
       {command:"joint_create",id:"j1",id1:"root",id2:"link1",
